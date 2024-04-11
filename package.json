@@ -1,0 +1,7 @@
+{
+    "name": "firefly",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ]
+}

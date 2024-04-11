@@ -1,0 +1,66 @@
+{
+  "name": "@outwalk/firefly",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "An experimental MVC framework built on top of express.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "types/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint src",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
+  "keywords": [
+    "outwalk",
+    "express",
+    "decorators",
+    "mvc"
+  ],
+  "files": [
+    "dist",
+    "types"
+  ],
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./mongoose": {
+      "types": "./types/mongoose.d.ts",
+      "import": "./dist/esm/database/mongoose.js",
+      "require": "./dist/cjs/database/mongoose.cjs"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OutwalkStudios/firefly.git",
+    "directory": "packages/firefly"
+  },
+  "bugs": {
+    "url": "https://github.com/OutwalkStudios/firefly/issues"
+  },
+  "homepage": "https://github.com/OutwalkStudios/firefly#readme",
+  "author": "Outwalk Studios <support@outwalkstudios.com> (https://www.outwalkstudios.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-multi-entry": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "esbuild": "^0.20.2",
+    "express": "^4.19.2",
+    "rollup": "^4.14.1",
+    "rollup-plugin-esbuild": "^6.1.1"
+  },
+  "optionalDependencies": {
+    "mongoose": "^8.3.1"
+  }
+}
