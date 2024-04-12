@@ -1,10 +1,8 @@
 {
   "name": "@outwalk/firefly",
-  "type": "module",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "An experimental MVC framework built on top of express.",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/index.js",
   "types": "types/index.d.ts",
   "publishConfig": {
     "access": "public"
@@ -28,16 +26,9 @@
     "types"
   ],
   "exports": {
-    ".": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    },
-    "./mongoose": {
-      "types": "./types/mongoose.d.ts",
-      "import": "./dist/esm/database/mongoose.js",
-      "require": "./dist/cjs/database/mongoose.cjs"
-    }
+    ".": "./dist/index.js",
+    "./errors": "./dist/errors.js",
+    "./mongoose": "./dist/mongoose.js"
   },
   "repository": {
     "type": "git",
