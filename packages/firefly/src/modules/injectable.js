@@ -6,9 +6,11 @@ export function Injectable() {
 }
 
 /* a decorator to apply metadata for dependency injection on a class property */
-export function Inject(name) {
+export function Inject(injectable) {
+    const injectableKey = (typeof injectable == "function") ? injectable.name : injectable;
+    
     return (target, key) => {
         target._meta = target._meta ?? { injected: [], routes: [] };
-        target._meta.injected.push({ propertyKey: key, injectableKey: name ?? toPascalCase(key) });
+        target._meta.injected.push({ propertyKey: key, injectableKey: injectableKey ?? toPascalCase(key) });
     };
 }

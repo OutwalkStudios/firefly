@@ -28,7 +28,7 @@ declare module "@outwalk/firefly" {
     export function Delete(route?: string): void;
 
     export function Injectable(): void;
-    export function Inject(name?: string | { new(): any }): void;
+    export function Inject(injectable?: string | { new(): any }): void;
 }
 
 declare module "@outwalk/firefly/errors" {
