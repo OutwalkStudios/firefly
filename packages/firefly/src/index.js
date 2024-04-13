@@ -28,7 +28,7 @@ export class Application {
 
         /* load the injectables and controllers from the filesystem */
         const injectables = await loadInjectables(this.routes);
-        const controllers = await loadControllers(this.routes, injectables);
+        const controllers = await loadControllers(this.routes, this.routes, injectables);
         Object.entries(controllers).forEach(([route, router]) => this.app.use(route, router));
 
         /* setup default error handling */

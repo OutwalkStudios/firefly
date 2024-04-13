@@ -50,20 +50,20 @@ export async function loadInjectables(directory, root = true) {
 }
 
 /* load and return the controllers */
-export async function loadControllers(directory, injectables) {
+export async function loadControllers(rootDirectory, currentDirectory, injectables) {
     const controllers = {};
 
-    const routes = fs.readdirSync(directory);
+    const routes = fs.readdirSync(currentDirectory);
     for (let route of routes) {
-        const stat = fs.statSync(path.join(directory, route));
+        const stat = fs.statSync(path.join(currentDirectory, route));
 
         if (stat.isDirectory()) {
-            const resolved = await loadControllers(path.join(directory, route), injectables);
+            const resolved = await loadControllers(rootDirectory, path.join(currentDirectory, route), injectables);
             Object.assign(controllers, resolved);
         }
 
         else if (stat.isFile() && route.endsWith(".controller.js")) {
-            const exports = await import(path.join(path.relative(__dirname, directory), route));
+            const exports = await import(path.join(path.relative(__dirname, currentDirectory), route));
 
             for (let name of Object.keys(exports)) {
                 if (!exports[name]?._meta?.controller) continue;
@@ -94,7 +94,7 @@ export async function loadControllers(directory, injectables) {
                     });
                 }
 
-                controllers[exports[name]._meta.route ?? directory.split("/routes").at(-1)] = router;
+                controllers[exports[name]._meta.route ?? currentDirectory.split(rootDirectory).at(-1)] = router;
             }
         }
     }
