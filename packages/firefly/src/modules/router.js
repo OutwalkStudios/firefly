@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { toCamlCase } from "../utils/string";
 
 /* load and return the injectables */
 export async function loadInjectables(directory, root = true) {
@@ -23,7 +22,7 @@ export async function loadInjectables(directory, root = true) {
                 if (!exports[name]?._meta?.injectable) continue;
 
                 const injectable = new exports[name]();
-                injectables[toCamlCase(name)] = injectable;
+                injectables[name] = injectable;
 
                 /* run the injectable init function if the injectable does not have any child injectables */
                 if (typeof injectable.init == "function" && !injectable?._meta?.injected) {

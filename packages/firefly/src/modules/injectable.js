@@ -1,3 +1,5 @@
+import { toPascalCase } from "../utils/string";
+
 /* a decorator to apply the injectable metadata to a class */
 export function Injectable() {
     return (target) => { target._meta = { injectable: true, name: target.name } };
@@ -7,6 +9,6 @@ export function Injectable() {
 export function Inject(name) {
     return (target, key) => {
         target._meta = target._meta ?? { injected: [], routes: [] };
-        target._meta.injected.push({ propertyKey: key, injectableKey: name ?? key });
+        target._meta.injected.push({ propertyKey: key, injectableKey: name ?? toPascalCase(key) });
     };
 }
