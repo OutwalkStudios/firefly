@@ -33,8 +33,8 @@ declare module "@outwalk/firefly" {
 
 declare module "@outwalk/firefly/errors" {
 
-    export class NotFound extends Error { statusCode: number = 404; }
-    export class BadRequest extends Error { statusCode: number = 500; }
+    export class NotFound extends Error { statusCode: number; }
+    export class BadRequest extends Error { statusCode: number; }
 }
 
 declare module "@outwalk/firefly/mongoose" {
