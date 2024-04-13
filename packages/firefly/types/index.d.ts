@@ -1,8 +1,8 @@
 declare module "@outwalk/firefly" {
     import type { Application as ExpressApplication } from "express";
 
-    interface Database { connect: () => Promise<void>, use: (plugin: any) => void }
-    interface ApplicationOptions { routes?: string, database?: Database, port?: number; }
+    export interface Database { connect: () => Promise<void>, use: (plugin: any) => void }
+    export interface ApplicationOptions { routes?: string, database?: Database, port?: number; }
 
     export class Application {
 
@@ -85,6 +85,7 @@ declare module "@outwalk/firefly/mongoose" {
     export class MongooseDriver {
 
         constructor(options?: { url?: string; } & ConnectOptions);
+        
         connect(): Promise<void>;
         use(plugin: any): void;
     }
