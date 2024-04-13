@@ -84,6 +84,8 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
                     router[route.method](route.route, async (req, res, next) => {
                         try {
                             const result = await route.handler.call(controller, req, res);
+                            if (result == undefined) return;
+
                             const status = (route.method == "get") ? 200 : 201;
                             const data = (typeof result === "object") ? JSON.stringify(result) : result;
 
@@ -94,7 +96,8 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
                     });
                 }
 
-                controllers[exports[name]._meta.route ?? currentDirectory.split(rootDirectory).at(-1)] = router;
+                const fileRoute = currentDirectory.split(rootDirectory).at(-1);
+                controllers[exports[name]._meta.route ?? fileRoute.length > 0 ? fileRoute : "/"] = router;
             }
         }
     }
