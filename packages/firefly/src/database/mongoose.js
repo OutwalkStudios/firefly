@@ -10,6 +10,10 @@ export class MongooseDriver {
     async connect() {
         await mongoose.connect(this.url);
     }
+
+    use(plugin) {
+        mongoose.plugin(plugin);
+    }
 }
 
 /* a decorator to create a schema and return a model in mongoose */
