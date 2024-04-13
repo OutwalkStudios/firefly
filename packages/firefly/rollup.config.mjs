@@ -10,8 +10,9 @@ const { dependencies, optionalDependencies } = JSON.parse(fs.readFileSync(new UR
 export default {
     input: [
         "src/index.js",
+        "src/cli/cli.js",
         "src/modules/errors.js",
-        "src/database/mongoose.js"
+        "src/database/mongoose.js",
     ],
     output: { dir: "dist", format: "cjs" },
     external: [...Object.keys(dependencies), ...Object.keys(optionalDependencies), ...module.builtinModules],

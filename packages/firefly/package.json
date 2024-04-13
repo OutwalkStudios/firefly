@@ -10,6 +10,9 @@
   "engines": {
     "node": ">=18"
   },
+  "bin": {
+    "firefly": "dist/cli.js"
+  },
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint src",
@@ -46,10 +49,12 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "chalk": "^4.1.2",
     "esbuild": "^0.20.2",
     "express": "^4.19.2",
     "rollup": "^4.14.1",
-    "rollup-plugin-esbuild": "^6.1.1"
+    "rollup-plugin-esbuild": "^6.1.1",
+    "yargs-parser": "^21.1.1"
   },
   "optionalDependencies": {
     "mongoose": "^8.3.1"
