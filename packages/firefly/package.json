@@ -47,13 +47,14 @@
   "dependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "chalk": "^4.1.2",
     "esbuild": "^0.20.2",
     "express": "^4.19.2",
+    "glob": "^10.3.12",
     "rollup": "^4.14.1",
     "rollup-plugin-esbuild": "^6.1.1",
+    "rollup-plugin-typescript-paths": "^1.5.0",
     "yargs-parser": "^21.1.1"
   },
   "optionalDependencies": {
