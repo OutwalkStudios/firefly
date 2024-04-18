@@ -1,9 +1,8 @@
-import { loadInjectables, loadControllers } from "./modules/router";
+import { loadInjectables, loadControllers } from "./modules/core/router";
 import express from "express";
 import path from "path";
 
 export class Application {
-
 
     constructor(options = {}) {
         this.routes = options.routes ?? path.join(process.cwd(), "dist/routes");
@@ -45,5 +44,5 @@ export class Application {
 }
 
 
-export * from "./modules/controller";
-export * from "./modules/injectable";
+export * from "./modules/core/controller";
+export * from "./modules/core/injectable";
