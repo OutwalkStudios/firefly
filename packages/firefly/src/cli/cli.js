@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import "dotenv/config";
+
 import yargs from "yargs-parser";
 import version from "./cmds/version";
 import help from "./cmds/help";

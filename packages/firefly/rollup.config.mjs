@@ -15,7 +15,11 @@ export default {
         "src/modules/database/mongoose.js",
     ],
     output: { dir: "dist", format: "cjs" },
-    external: [...Object.keys(dependencies), ...Object.keys(optionalDependencies), ...module.builtinModules],
+    external: [
+        ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
+        ...Object.keys(optionalDependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
+        ...module.builtinModules
+    ],
     plugins: [
         resolve(),
         commonjs(),
