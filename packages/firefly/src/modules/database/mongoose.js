@@ -19,8 +19,12 @@ export class MongooseDriver {
 /* a decorator to create a schema and return a model in mongoose */
 export function Entity(options = {}) {
     return (target) => {
+        /* remove the prototype chain, this enables extending Model */
+        const entity = new Object();
+        entity.constructor._meta = target._meta;
+
         /* update the schema with default property values */
-        const props = Object.entries(new target()).filter(([key, value]) => target._meta.props[key] && value != undefined);
+        const props = Object.entries(entity).filter(([key, value]) => target._meta.props[key] && value != undefined);
         props.forEach(([key, value]) => target._meta.props[key] = { type: target._meta.props[key], default: value });
 
         const schema = new mongoose.Schema(target._meta.props, options);
