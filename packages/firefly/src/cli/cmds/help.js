@@ -19,6 +19,9 @@ const menus = {
     build: `
     Usage: ${green("firefly build <options>")}
     - Builds the Firefly application.
+
+    Options:
+        ${green("-d, --dev")} ........ Builds the Firefly application in dev mode.
     `,
 
     start: `

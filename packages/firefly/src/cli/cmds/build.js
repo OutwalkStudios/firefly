@@ -15,10 +15,11 @@ import { typescriptPaths } from "rollup-plugin-typescript-paths";
 const green = chalk.hex("#ADFF2F");
 
 /* build the project for production */
-export default async function build() {
+export default async function build(args) {
+    const isDev = (args.dev || args.d);
 
     /* set the node environment */
-    process.env.NODE_ENV = process.env.NODE_ENV ?? "production";
+    process.env.NODE_ENV = isDev ? "development" : "production";
 
     try {
         console.log(`${green("[firefly]")} - building the project...`);
@@ -45,19 +46,45 @@ export default async function build() {
             ],
             plugins: [
                 esbuild.default({ target: `node${version}`, loaders: { ".js": "ts" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json" }),
-                typescriptPaths({ tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
+                typescriptPaths({ preserveExtensions: true, tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
                 resolve(),
                 commonjs(),
                 json(),
             ]
         };
 
-        /* create the build and write it to disk */
-        const bundle = await rollup.rollup(config);
-        await bundle.write(config.output);
-        await bundle.close();
+        /* if building for production build and write it to disk */
+        if (!isDev) {
+            const bundle = await rollup.rollup(config);
+            await bundle.write(config.output);
+            await bundle.close();
 
-        console.log(`${green("[firefly]")} - build completed.`);
+            console.log(`${green("[firefly]")} - build completed.`);
+            return;
+        }
+
+        /* if building for development, watch for changes */
+        config.watch = { exclude: "node_modules/**" };
+        const watcher = rollup.watch(config);
+
+        watcher.on("event", (event) => {
+            switch(event.code) {
+                case "BUNDLE_END":
+                    console.log(`${green("[firefly]")} - build completed.`);
+                    event.result.close();
+                    break;
+                
+                case "ERROR":
+                    console.log(`${chalk.red("[firefly]")} - ${event.error.message}`);
+                    if (event.error.frame) console.log(event.error.frame);
+                    break;
+
+                case "FATAL":
+                    console.log(`${chalk.red("[firefly]")} - Fatal Error Occurred.`);
+                    process.exit(1);
+            }
+        });
+
     } catch (error) {
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
         if (error.frame) console.log(error.frame);
