@@ -4,8 +4,7 @@ declare module "@outwalk/firefly" {
     export interface Database { connect: () => Promise<void>, use: (plugin: any) => void }
     export interface ApplicationOptions { routes?: string, database?: Database, port?: number; }
 
-    export type ClassDecorator = (constructor: Function) => void;
-    export type InstanceDecorator = (target: any, propertyKey: string, descriptor?: PropertyDescriptor) => void;
+    export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
     export class Application {
 
@@ -21,17 +20,17 @@ declare module "@outwalk/firefly" {
         listen(): Promise<void>
     }
 
-    export function Controller(route?: string): ClassDecorator;
-    export function Http(method: string, route?: string): InstanceDecorator;
-    export function Head(route?: string): InstanceDecorator;
-    export function Get(route?: string): InstanceDecorator;
-    export function Post(route?: string): InstanceDecorator;
-    export function Put(route?: string): InstanceDecorator;
-    export function Patch(route?: string): InstanceDecorator;
-    export function Delete(route?: string): InstanceDecorator;
+    export function Controller(route?: string): Decorator;
+    export function Http(method: string, route?: string): Decorator;
+    export function Head(route?: string): Decorator;
+    export function Get(route?: string): Decorator;
+    export function Post(route?: string): Decorator;
+    export function Put(route?: string): Decorator;
+    export function Patch(route?: string): Decorator;
+    export function Delete(route?: string): Decorator;
 
-    export function Injectable(): ClassDecorator;
-    export function Inject(injectable?: string | { new(): any }): InstanceDecorator;
+    export function Injectable(): Decorator;
+    export function Inject(injectable?: string | { new(): any }): Decorator;
 }
 
 declare module "@outwalk/firefly/errors" {
@@ -81,10 +80,10 @@ declare module "@outwalk/firefly/errors" {
 
 declare module "@outwalk/firefly/mongoose" {
     import type { SchemaOptions, Schema, ConnectOptions } from "mongoose";
-    import type { ClassDecorator, InstanceDecorator } from "@outwalk/firefly";
+    import type { Decorator } from "@outwalk/firefly";
 
-    export function Entity(options?: { plugins?: []; } & SchemaOptions): ClassDecorator;
-    export function Prop(type: Object | Schema): InstanceDecorator;
+    export function Entity(options?: { plugins?: []; } & SchemaOptions): Decorator;
+    export function Prop(type: Object | Schema): Decorator;
 
     export class MongooseDriver {
 
