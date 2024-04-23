@@ -5,7 +5,7 @@ import path from "path";
 export class Application {
 
     constructor(options = {}) {
-        this.routes = options.routes ?? path.join(process.cwd(), "dist/routes");
+        this.routes = options.routes ?? path.join(process.cwd(), "dist");
         this.database = options.database;
         this.port = options.port ?? (process.env.PORT ?? 8080);
 
