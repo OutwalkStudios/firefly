@@ -25,8 +25,9 @@ export default async function build(args) {
         console.log(`${green("[firefly]")} - building the project...`);
 
         /* get the projects package.json and determine language */
-        const { engines, dependencies } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
+        const { main, engines, dependencies } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
         const isTypeScript = fs.existsSync(path.join(process.cwd(), "tsconfig.json"));
+        const dist = main.split("/")[0];
 
         /* determine the node version being targeted */
         const [version] = (engines?.node ?? process.versions.node.split(".")[0]).match(/\d+[^.\|]/g);
@@ -39,7 +40,7 @@ export default async function build(args) {
 
         const config = {
             input: Object.fromEntries(files),
-            output: { dir: "dist", format: "cjs" },
+            output: { dir: dist, format: "cjs" },
             external: [
                 ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
                 ...module.builtinModules
@@ -88,7 +89,5 @@ export default async function build(args) {
     } catch (error) {
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
         if (error.frame) console.log(error.frame);
-
-        throw error;
     }
 }

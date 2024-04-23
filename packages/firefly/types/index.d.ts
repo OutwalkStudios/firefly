@@ -2,7 +2,7 @@ declare module "@outwalk/firefly" {
     import type { Application as ExpressApplication } from "express";
 
     export interface Database { connect: () => Promise<void>, use: (plugin: any) => void }
-    export interface ApplicationOptions { routes?: string, database?: Database, port?: number; }
+    export interface ApplicationOptions { database?: Database }
 
     export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
@@ -10,14 +10,12 @@ declare module "@outwalk/firefly" {
 
         app: ExpressApplication;
 
-        private routes: string;
         private database: Database;
-        private port: number;
 
         constructor(options?: ApplicationOptions);
 
         use(middleware: any): void;
-        listen(): Promise<void>
+        listen(port?: number): Promise<void>
     }
 
     export function Controller(route?: string): Decorator;

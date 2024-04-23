@@ -1,13 +1,12 @@
 import { loadInjectables, loadControllers } from "./modules/core/router";
 import express from "express";
 import path from "path";
+import fs from "fs";
 
 export class Application {
 
     constructor(options = {}) {
-        this.routes = options.routes ?? path.join(process.cwd(), "dist");
         this.database = options.database;
-        this.port = options.port ?? (process.env.PORT ?? 8080);
 
         this.app = express();
 
@@ -21,13 +20,17 @@ export class Application {
         this.app.use(middleware);
     }
 
-    async listen() {
+    async listen(port = process.env.PORT ?? 8080) {
+        /* determine the location to load routes from */
+        const { main } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
+        const root = main.split("/")[0];
+
         /* if a database driver is provided, run the connect method */
         if (this.database) await this.database.connect();
 
         /* load the injectables and controllers from the filesystem */
-        const injectables = await loadInjectables(this.routes);
-        const controllers = await loadControllers(this.routes, this.routes, injectables);
+        const injectables = await loadInjectables(root);
+        const controllers = await loadControllers(root, root, injectables);
         Object.entries(controllers).forEach(([route, router]) => this.app.use(route, router));
 
         /* setup default error handling */
@@ -39,7 +42,7 @@ export class Application {
         });
 
         /* start the web server */
-        this.app.listen(this.port);
+        this.app.listen(port);
     }
 }
 
