@@ -2,7 +2,7 @@
 function createHttpDecorator(method, route = "/") {
     return (target, key) => {
         target._meta = target._meta ?? { injected: [], routes: [] };
-        target._meta.routes.push({ method, route, handler: target[key] });
+        target._meta.routes.push({ method: method.toLowerCase(), route, handler: target[key] });
     }
 }
 
@@ -12,9 +12,9 @@ export function Controller(route) {
 }
 
 export const Http = createHttpDecorator;
-export const Head = createHttpDecorator.bind(null, "head");
-export const Get = createHttpDecorator.bind(null, "get");
-export const Post = createHttpDecorator.bind(null, "post");
-export const Put = createHttpDecorator.bind(null, "put");
-export const Patch = createHttpDecorator.bind(null, "patch");
-export const Delete = createHttpDecorator.bind(null, "delete");
+export const Head = createHttpDecorator.bind(null, "HEAD");
+export const Get = createHttpDecorator.bind(null, "GET");
+export const Post = createHttpDecorator.bind(null, "POST");
+export const Put = createHttpDecorator.bind(null, "PUT");
+export const Patch = createHttpDecorator.bind(null, "PATCH");
+export const Delete = createHttpDecorator.bind(null, "DELETE");
