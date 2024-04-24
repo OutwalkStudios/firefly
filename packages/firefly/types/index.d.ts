@@ -1,21 +1,29 @@
 declare module "@outwalk/firefly" {
-    import type { Application as ExpressApplication } from "express";
-
-    export interface Database { connect: () => Promise<void>, use: (plugin: any) => void }
-    export interface ApplicationOptions { database?: Database }
+    export interface Route { method: string, route: string, handler: Function }
+    export interface Options { platform: Platform, database?: Database }
 
     export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
+    export abstract class Platform { 
+
+        protected abstract loadController(route: string, routes: Route[]): void;
+        protected abstract loadErrorHandler(): void;
+        protected abstract listen(port: number): void;
+    }
+
+    export abstract class Database { 
+
+        protected abstract connect(): Promise<void>;
+    }
+
     export class Application {
 
-        app: ExpressApplication;
-
+        private platform: Platform;
         private database: Database;
 
-        constructor(options?: ApplicationOptions);
+        constructor(options: Options);
 
-        use(middleware: any): void;
-        listen(port?: number): Promise<void>
+        listen(port?: number): Promise<void>;
     }
 
     export function Controller(route?: string): Decorator;
@@ -76,18 +84,32 @@ declare module "@outwalk/firefly/errors" {
     export class NetworkAuthenticationRequired extends HttpError { constructor(message?: string) }
 }
 
+declare module "@outwalk/firefly/express" {
+    import type { Platform, Route } from "@outwalk/firefly";
+
+    export class ExpressPlatform extends Platform {
+
+        protected loadController(route: string, routes: Route[]): void;
+        protected loadErrorHandler(): void;
+        protected listen(port: number): void;
+
+        use(middleware: any): void;
+    }
+}
+
 declare module "@outwalk/firefly/mongoose" {
     import type { SchemaOptions, Schema, ConnectOptions } from "mongoose";
-    import type { Decorator } from "@outwalk/firefly";
+    import type { Decorator, Database } from "@outwalk/firefly";
 
     export function Entity(options?: { plugins?: []; } & SchemaOptions): Decorator;
     export function Prop(type: Object | Schema): Decorator;
 
-    export class MongooseDriver {
+    export class MongooseDriver extends Database {
 
         constructor(options?: { url?: string; } & ConnectOptions);
-        
-        connect(): Promise<void>;
-        use(plugin: any): void;
+
+        protected connect(): Promise<void>;
+
+        plugin(plugin: any): void;
     }
 }

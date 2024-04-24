@@ -1,23 +1,12 @@
 import { loadInjectables, loadControllers } from "./modules/core/router";
-import express from "express";
 import path from "path";
 import fs from "fs";
 
 export class Application {
 
     constructor(options = {}) {
+        this.platform = options.platform;
         this.database = options.database;
-
-        this.app = express();
-
-        this.app.disable("x-powered-by");
-        this.app.use(express.urlencoded({ extended: true }));
-        this.app.use(express.json());
-    }
-
-    /* connect a middleware function to the application */
-    use(middleware) {
-        this.app.use(middleware);
     }
 
     async listen(port = process.env.PORT ?? 8080) {
@@ -31,21 +20,18 @@ export class Application {
         /* load the injectables and controllers from the filesystem */
         const injectables = await loadInjectables(root);
         const controllers = await loadControllers(root, root, injectables);
-        Object.entries(controllers).forEach(([route, router]) => this.app.use(route, router));
+        Object.entries(controllers).forEach(([route, routes]) => this.platform.loadController(route, routes));
 
-        /* setup default error handling */
-        this.app.use((error, req, res, next) => {
-            const statusCode = error.statusCode ?? 500;
-            const message = error.message ?? "Something went wrong.";
-
-            return res.status(statusCode).json({ message });
-        });
+        /* setup the platform error handling */
+        if (this.platform.loadErrorHandler) this.platform.loadErrorHandler();
 
         /* start the web server */
-        this.app.listen(port);
+        this.platform.listen(port);
     }
 }
 
 
 export * from "./modules/core/controller";
 export * from "./modules/core/injectable";
+export * from "./modules/platform/platform";
+export * from "./modules/database/database";

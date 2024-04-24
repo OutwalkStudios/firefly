@@ -1,4 +1,3 @@
-import express from "express";
 import path from "path";
 import fs from "fs";
 
@@ -68,7 +67,6 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
                 if (!exports[name]?._meta?.controller) continue;
 
                 const controller = new exports[name]();
-                const router = express.Router();
 
                 /* inject any injectables */
                 for (let injectable of controller._meta.injected) {
@@ -80,23 +78,11 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
 
                 /* register any http routes */
                 for (let route of controller._meta.routes) {
-                    router[route.method](route.route, async (req, res, next) => {
-                        try {
-                            const result = await route.handler.call(controller, req, res);
-                            if (result == undefined) return;
-
-                            const status = (route.method == "get") ? 200 : 201;
-                            const data = (typeof result === "object") ? JSON.stringify(result) : result;
-
-                            res.status(status).send(data);
-                        } catch (error) {
-                            next(error);
-                        }
-                    });
+                    route.handler = route.handler.bind(controller);
                 }
 
                 const fileRoute = currentDirectory.split(rootDirectory).at(-1);
-                controllers[exports[name]._meta.route ?? fileRoute.length > 0 ? fileRoute : "/"] = router;
+                controllers[exports[name]._meta.route ?? fileRoute.length > 0 ? fileRoute : "/"] = controller._meta.routes;
             }
         }
     }

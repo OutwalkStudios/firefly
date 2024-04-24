@@ -1,18 +1,21 @@
+import { Database } from "./database";
 import mongoose from "mongoose";
 
 /* A driver to connect to a mongodb database using mongoose */
-export class MongooseDriver {
+export class MongooseDriver extends Database {
 
     constructor(options = {}) {
+        super();
+        
+        this.options = options;
         this.url = options.url ?? process.env.DATABASE_URL;
     }
 
-    async connect() {
-        await mongoose.connect(this.url);
-    }
+    plugin(plugin) { mongoose.plugin(plugin) }
 
-    use(plugin) {
-        mongoose.plugin(plugin);
+    async connect() {
+        await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
+        mongoose.connection.on("error", (error) => { throw error; });
     }
 }
 
