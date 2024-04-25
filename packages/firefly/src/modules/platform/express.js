@@ -27,7 +27,7 @@ export class ExpressPlatform extends Platform {
                     const result = await route.handler(req, res);
                     if (result == undefined) return;
 
-                    const status = (route.method == "get") ? 200 : 201;
+                    const status = (route.method == "post") ? 201 : 200;
                     const data = (typeof result === "object") ? JSON.stringify(result) : result;
 
                     res.status(status).send(data);
