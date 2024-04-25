@@ -1,14 +1,25 @@
 /* create an http decorator function */
 function createHttpDecorator(method, route = "/") {
     return (target, key) => {
-        target._meta = target._meta ?? { injected: [], routes: [] };
-        target._meta.routes.push({ method: method.toLowerCase(), route, handler: target[key] });
+        target._routes = target._routes ?? [];
+        target._routes.push({ method: method.toLowerCase(), route: route, handler: target[key] });
     }
 }
 
 /* a decorator to apply the controller metadata to a class */
 export function Controller(route) {
-    return (target) => { target._meta = { controller: true, route } };
+    return (target) => {
+        target._controller = true;
+        target._route = route;
+    };
+}
+
+/* a decorator to apply middleware to a controller or route */
+export function Middleware(...args) {
+    return (target, key = "class") => {
+        target._middleware = target._middleware ?? {};
+        target._middleware[key] = args;
+    }
 }
 
 export const Http = createHttpDecorator;

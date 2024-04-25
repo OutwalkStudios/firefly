@@ -24,13 +24,13 @@ export function Entity(options = {}) {
     return (target) => {
         /* remove the prototype chain, this enables extending Model */
         const entity = new Object();
-        entity.constructor._meta = target._meta;
+        entity.constructor._props= target._props;
 
         /* update the schema with default property values */
-        const props = Object.entries(entity).filter(([key, value]) => target._meta.props[key] && value != undefined);
-        props.forEach(([key, value]) => target._meta.props[key] = { type: target._meta.props[key], default: value });
+        const props = Object.entries(entity).filter(([key, value]) => target._props[key] && value != undefined);
+        props.forEach(([key, value]) => target._props[key] = { type: target._props[key], default: value });
 
-        const schema = new mongoose.Schema(target._meta.props, options);
+        const schema = new mongoose.Schema(target._props, options);
         return new mongoose.model(target.name, schema.loadClass(target));
     };
 }
@@ -58,7 +58,7 @@ export function Prop(type) {
     };
 
     return (target, key) => {
-        target.constructor._meta = target.constructor._meta ?? { props: {} };
-        target.constructor._meta.props[key] = processType(type);
+        target.constructor._props = target.constructor._props ?? {};
+        target.constructor._props[key] = processType(type);
     };
 }

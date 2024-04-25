@@ -1,12 +1,12 @@
 declare module "@outwalk/firefly" {
-    export interface Route { method: string, route: string, handler: Function }
+    export interface Route { method: string, middleware: Function[], route: string, handler: Function }
     export interface Options { platform: Platform, database?: Database }
 
     export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
     export abstract class Platform { 
 
-        protected abstract loadController(route: string, routes: Route[]): void;
+        protected abstract loadController(route: string, middleware: Function[], routes: Route[]): void;
         protected abstract loadErrorHandler(): void;
         protected abstract listen(port: number): void;
     }
@@ -34,6 +34,8 @@ declare module "@outwalk/firefly" {
     export function Put(route?: string): Decorator;
     export function Patch(route?: string): Decorator;
     export function Delete(route?: string): Decorator;
+
+    export function Middleware(...middleware: Function[]): Decorator;
 
     export function Injectable(): Decorator;
     export function Inject(injectable?: string | { new(): any }): Decorator;
@@ -89,7 +91,7 @@ declare module "@outwalk/firefly/express" {
 
     export class ExpressPlatform extends Platform {
 
-        protected loadController(route: string, routes: Route[]): void;
+        protected loadController(route: string, middleware: Function[], routes: Route[]): void;
         protected loadErrorHandler(): void;
         protected listen(port: number): void;
 

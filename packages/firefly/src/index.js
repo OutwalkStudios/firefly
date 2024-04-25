@@ -20,10 +20,13 @@ export class Application {
         /* load the injectables and controllers from the filesystem */
         const injectables = await loadInjectables(root);
         const controllers = await loadControllers(root, root, injectables);
-        Object.entries(controllers).forEach(([route, routes]) => this.platform.loadController(route, routes));
+
+        Object.entries(controllers).forEach(([route, { middleware, routes }]) => {
+            this.platform.loadController(route, middleware, routes);
+        });
 
         /* setup the platform error handling */
-        if (this.platform.loadErrorHandler) this.platform.loadErrorHandler();
+        this.platform.loadErrorHandler();
 
         /* start the web server */
         this.platform.listen(port);

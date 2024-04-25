@@ -5,9 +5,9 @@ export class ExpressPlatform extends Platform {
 
     constructor() {
         super();
-        
+
         this.app = express();
-        
+
         this.app.disable("x-powered-by");
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(express.json());
@@ -16,11 +16,13 @@ export class ExpressPlatform extends Platform {
     use(middleware) { this.app.use(middleware); }
     listen(port) { this.app.listen(port); }
 
-    loadController(route, routes) {
+    loadController(route, middleware, routes) {
         const router = express.Router();
+        if (middleware.length > 0) router.use(...middleware);
 
         for (let route of routes) {
-            router[route.method](route.route, async (req, res, next) => {
+
+            router[route.method](route.route, ...route.middleware, async (req, res, next) => {
                 try {
                     const result = await route.handler(req, res);
                     if (result == undefined) return;

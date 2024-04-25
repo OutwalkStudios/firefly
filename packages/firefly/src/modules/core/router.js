@@ -18,13 +18,13 @@ export async function loadInjectables(directory, root = true) {
             const exports = await import(path.join(path.relative(__dirname, directory), route));
 
             for (let name of Object.keys(exports)) {
-                if (!exports[name]?._meta?.injectable) continue;
+                if (!exports[name]?._injectable) continue;
 
                 const injectable = new exports[name]();
                 injectables[name] = injectable;
 
                 /* run the injectable init function if the injectable does not have any child injectables */
-                if (typeof injectable.init == "function" && !injectable?._meta?.injected) {
+                if (typeof injectable.init == "function" && !injectable?._injected) {
                     await injectable.init();
                 }
             }
@@ -34,9 +34,9 @@ export async function loadInjectables(directory, root = true) {
 
     /* if this is the root load call, inject the nested injectables */
     if (root) {
-        const nestedInjectables = Object.values(injectables).filter((injectable) => injectable?._meta?.injected != undefined);
+        const nestedInjectables = Object.values(injectables).filter((injectable) => injectable?._injected);
         for (let injectable of nestedInjectables) {
-            for (let inject of injectable._meta.injected) {
+            for (let inject of injectable._injected) {
                 injectable[inject.propertyKey] = injectables[inject.injectableKey];
             }
 
@@ -64,25 +64,29 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
             const exports = await import(path.join(path.relative(__dirname, currentDirectory), route));
 
             for (let name of Object.keys(exports)) {
-                if (!exports[name]?._meta?.controller) continue;
+                if (!exports[name]?._controller) continue;
 
                 const controller = new exports[name]();
+                const middleware = (exports[name]?._middleware?.class) || [];
 
                 /* inject any injectables */
-                for (let injectable of controller._meta.injected) {
+                for (let injectable of controller._injected ?? []) {
                     controller[injectable.propertyKey] = injectables[injectable.injectableKey];
                 }
 
                 /* run the controller init function */
                 if (typeof controller.init == "function") await controller.init();
 
-                /* register any http routes */
-                for (let route of controller._meta.routes) {
+                /* assign the middleware and bind the context to the controller */
+                for (let route of controller._routes) {
+                    route.middleware = controller._middleware?.[route.handler.name] ?? [];
                     route.handler = route.handler.bind(controller);
                 }
 
                 const fileRoute = currentDirectory.split(rootDirectory).at(-1);
-                controllers[exports[name]._meta.route ?? fileRoute.length > 0 ? fileRoute : "/"] = controller._meta.routes;
+                const endpoint = exports[name]._route ?? fileRoute.length > 0 ? fileRoute : "/";
+
+                controllers[endpoint] = { middleware: middleware, routes: controller._routes };
             }
         }
     }
