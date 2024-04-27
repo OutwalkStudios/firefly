@@ -1,0 +1,1 @@
+import { ExpressPlatform } from "@outwalk/firefly/express";

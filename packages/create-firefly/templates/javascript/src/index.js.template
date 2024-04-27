@@ -1,0 +1,10 @@
+import { Application } from "@outwalk/firefly";
+{{import-platform}}
+{{import-database}}
+
+{{define-platform}}
+
+{{define-database}}
+
+/* start the application */
+new Application({{define-options}}).listen();

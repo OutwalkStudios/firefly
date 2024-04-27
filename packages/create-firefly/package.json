@@ -1,0 +1,57 @@
+{
+    "name": "@outwalk/create-firefly",
+    "version": "0.1.0",
+    "description": "Firefly - a modern scalable web framework.",
+    "main": "dist/index.js",
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "bin": {
+        "create-firefly": "dist/index.js"
+    },
+    "scripts": {
+        "build": "rollup -c",
+        "lint": "eslint src",
+        "prepublishOnly": "npm run lint && npm run build"
+    },
+    "keywords": [
+        "outwalk",
+        "express",
+        "decorators",
+        "mvc"
+    ],
+    "files": [
+        "dist",
+        "templates"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OutwalkStudios/firefly.git",
+        "directory": "packages/create-firefly"
+    },
+    "bugs": {
+        "url": "https://github.com/OutwalkStudios/firefly/issues"
+    },
+    "homepage": "https://github.com/OutwalkStudios/firefly#readme",
+    "author": "Outwalk Studios <support@outwalkstudios.com> (https://www.outwalkstudios.com/)",
+    "license": "MIT",
+    "dependencies": {
+        "chalk": "^4.1.2",
+        "prompts": "^2.4.2",
+        "yargs-parser": "^21.1.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.1.1",
+        "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-json": "^6.1.0",
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "esbuild": "^0.20.2",
+        "eslint": "^9.1.1",
+        "globals": "^15.0.0",
+        "rollup": "^4.16.4",
+        "rollup-plugin-esbuild": "^6.1.1"
+    }
+}
