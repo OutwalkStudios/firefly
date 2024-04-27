@@ -50,28 +50,21 @@
   "author": "Outwalk Studios <support@outwalkstudios.com> (https://www.outwalkstudios.com/)",
   "license": "MIT",
   "dependencies": {
+    "@eslint/js": "^9.1.1",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "chalk": "^4.1.2",
     "dotenv": "^16.4.5",
     "esbuild": "^0.20.2",
+    "eslint": "^9.1.1",
     "glob": "^10.3.12",
+    "globals": "^15.0.0",
     "nodemon": "^3.1.0",
     "rollup": "^4.14.1",
     "rollup-plugin-esbuild": "^6.1.1",
     "rollup-plugin-typescript-paths": "^1.5.0",
     "yargs-parser": "^21.1.1"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3.0.2",
-    "@eslint/js": "^9.1.1",
-    "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1",
-    "globals": "^15.0.0"
   },
   "peerDependenciesMeta": {
     "express": {

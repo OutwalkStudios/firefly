@@ -41,7 +41,6 @@ export class ExpressPlatform extends Platform {
     }
 
     loadErrorHandler() {
-        // eslint-disable-next-line no-unused-vars
         this.app.use((error, req, res, next) => {
             const statusCode = error.statusCode ?? 500;
             const message = error.message ?? "Something went wrong.";
