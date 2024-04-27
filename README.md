@@ -1,3 +1,3 @@
 # Outwalk Firefly
 
-An experimental MVC framework built on top of express.
+A modern scalable web framework.
