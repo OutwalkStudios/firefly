@@ -11,7 +11,6 @@ import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 
-
 const green = chalk.hex("#ADFF2F");
 
 /* build the project for production */
