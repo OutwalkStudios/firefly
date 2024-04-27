@@ -3,7 +3,7 @@ function createHttpDecorator(method, route = "/") {
     return (target, key) => {
         target._routes = target._routes ?? [];
         target._routes.push({ method: method.toLowerCase(), route: route, handler: target[key] });
-    }
+    };
 }
 
 /* a decorator to apply the controller metadata to a class */
@@ -19,7 +19,7 @@ export function Middleware(...args) {
     return (target, key = "class") => {
         target._middleware = target._middleware ?? {};
         target._middleware[key] = args;
-    }
+    };
 }
 
 export const Http = createHttpDecorator;

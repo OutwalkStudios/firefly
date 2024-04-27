@@ -30,7 +30,7 @@ export default async function build(args) {
         const dist = main.split("/")[0];
 
         /* determine the node version being targeted */
-        const [version] = (engines?.node ?? process.versions.node.split(".")[0]).match(/\d+[^.\|]/g);
+        const [version] = (engines?.node ?? process.versions.node.split(".")[0]).match(/\d+[^.|]/g);
 
         /* determine the input files */
         const files = globSync("src/**/*.{js,ts}").map((file) => [

@@ -11,7 +11,7 @@ export class MongooseDriver extends Database {
         this.url = options.url ?? process.env.DATABASE_URL;
     }
 
-    plugin(plugin) { mongoose.plugin(plugin) }
+    plugin(plugin) { mongoose.plugin(plugin); }
 
     async connect() {
         await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
@@ -40,7 +40,7 @@ export function Prop(type) {
     /* process the type to resolve references to other models */
     const processType = (type) => {
         if (type.name == "model") {
-            return { type: mongoose.Types.ObjectId, ref: type.modelName }
+            return { type: mongoose.Types.ObjectId, ref: type.modelName };
         }
 
         if (Array.isArray(type) && type[0].name == "model") {
