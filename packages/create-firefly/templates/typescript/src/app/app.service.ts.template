@@ -1,0 +1,9 @@
+import { Injectable } from "@outwalk/firefly";
+
+@Injectable()
+export class AppService {
+
+    getHelloWorld(): string {
+        return "Hello World!";
+    }
+}

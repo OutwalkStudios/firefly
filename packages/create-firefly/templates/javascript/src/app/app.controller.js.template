@@ -1,0 +1,12 @@
+import { Controller, Inject, Get } from "@outwalk/firefly";
+
+@Controller()
+export class AppController {
+
+    @Inject() appService;
+
+    @Get()
+    getHelloWorld() {
+        return this.appService.getHelloWorld();
+    }
+}
