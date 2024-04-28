@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 
 import { deleteDirectory, createDirectory, copyTemplate, injectSnippet } from "./utils/template";
+import { installDependencies, intitializeGitRepository } from "./utils/dependencies";
 
 /* set the firefly hex code */
 const firefly = chalk.hex("#ADFF2F");
@@ -87,7 +88,7 @@ const questions = [
         }
     }
 
-    console.log(`\n${firefly("[firefly]")} - creating ${config.name}...\n`);
+    console.log(`\n${firefly("[firefly]")} - creating ${config.name}...`);
 
     /* Start copying template files to the destination */
     try {
@@ -104,5 +105,24 @@ const questions = [
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
         return;
     }
+
+    /* initialize the project depending on what the cli flags have enabled */
+    try {
+        if (!skipInstall) await installDependencies(dependencies, config.name);
+        if (!skipGit) await intitializeGitRepository(config.name);
+    } catch (error) {
+        console.error(`${chalk.red("[firefly]")} - ${error.message}`);
+        deleteDirectory(config.name);
+        return;
+    }
+
+    console.log("\n----------------------------------");
+    console.log("Get started with your new project!\n");
+    console.log(firefly(` > cd ./${path.relative(process.cwd(), config.name)} `));
+
+    if (skipInstall) console.log(firefly(" > npm install"));
+    console.log(firefly(" > npm run dev"));
+
+    console.log("----------------------------------");
 
 })();
