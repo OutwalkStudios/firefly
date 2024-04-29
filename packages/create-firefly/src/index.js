@@ -63,6 +63,7 @@ const questions = [
     const skipGit = args["skip-git"];
     const force = args["force"];
 
+    const settings = { useCurrentDirectory: false };
     const dependencies = ["@outwalk/firefly"];
 
     /* add the platform to dependencies if its an npm package */
@@ -75,10 +76,28 @@ const questions = [
         dependencies.push(config.database);
     }
 
+    /* change the project name when generating in the current directory */
+    if (config.name == ".") {
+        if (!force && fs.readdirSync(config.name).length > 0) {
+            const response = await prompts({
+                type: "confirm",
+                name: "continue",
+                message: "The current directory is not empty. Continue?",
+                initial: true
+            });
+
+            if (!response.continue) return;
+        }
+
+        config.name = path.basename(process.cwd());
+        settings.useCurrentDirectory = true;
+    }
+
     /* check if the project directory already exists */
     if (fs.existsSync(config.name)) {
-        if (force) TemplateBuilder.deleteDirectory(config.name);
-        else {
+        if (force && !settings.useCurrentDirectory) {
+            TemplateBuilder.deleteDirectory(config.name);
+        } else {
             console.error(`${chalk.red("[firefly]")} - ${config.name} already exists.`);
             return;
         }
@@ -86,13 +105,14 @@ const questions = [
 
     console.log(`\n${firefly("[firefly]")} - creating ${config.name}...`);
 
+    /* find the template paths */
+    const templatePath = path.join(__dirname, "../templates/", config.language);
+    const snippetPath = path.join(__dirname, "../templates/snippets");
+    const projectPath = !settings.useCurrentDirectory ? config.name : ".";
+
     /* Start copying template files to the destination */
     try {
-        /* find the template paths */
-        const templatePath = path.join(__dirname, "../templates/", config.language);
-        const snippetPath = path.join(__dirname, "../templates/snippets");
-
-        const template = new TemplateBuilder(templatePath, config.name);
+        const template = new TemplateBuilder(templatePath, projectPath);
 
         /* inject global template variables */
         template.inject("project-name", config.name);
@@ -127,17 +147,19 @@ const questions = [
 
     /* initialize the project depending on what the cli flags have enabled */
     try {
-        if (!skipInstall) await installDependencies(dependencies, config.name);
-        if (!skipGit) await intitializeGitRepository(config.name);
+        if (!skipInstall) await installDependencies(dependencies, projectPath);
+        if (!skipGit) await intitializeGitRepository(projectPath);
     } catch (error) {
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
-        TemplateBuilder.deleteDirectory(config.name);
+        if (!settings.useCurrentDirectory) TemplateBuilder.deleteDirectory(config.name);
         return;
     }
 
     console.log("\n----------------------------------");
     console.log("Get started with your new project!\n");
-    console.log(firefly(` > cd ./${path.relative(process.cwd(), config.name)} `));
+    if (!settings.useCurrentDirectory) {
+        console.log(firefly(` > cd ./${path.relative(process.cwd(), config.name)} `));
+    }
 
     if (skipInstall) console.log(firefly(" > npm install"));
     console.log(firefly(" > npm run dev"));
