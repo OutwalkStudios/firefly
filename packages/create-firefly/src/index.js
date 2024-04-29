@@ -4,7 +4,7 @@ import chalk from "chalk";
 import path from "path";
 import fs from "fs";
 
-import { deleteDirectory, createDirectory, copyTemplate, injectSnippet } from "./utils/template";
+import { TemplateBuilder } from "./utils/template";
 import { installDependencies, intitializeGitRepository } from "./utils/dependencies";
 
 /* set the firefly hex code */
@@ -63,10 +63,6 @@ const questions = [
     const skipGit = args["skip-git"];
     const force = args["force"];
 
-    /* find the template paths */
-    const template = path.join(__dirname, "../templates/", config.language);
-    const snippets = path.join(__dirname, "../templates/snippets");
-
     const dependencies = ["@outwalk/firefly"];
 
     /* add the platform to dependencies if its an npm package */
@@ -81,7 +77,7 @@ const questions = [
 
     /* check if the project directory already exists */
     if (fs.existsSync(config.name)) {
-        if (force) deleteDirectory(config.name);
+        if (force) TemplateBuilder.deleteDirectory(config.name);
         else {
             console.error(`${chalk.red("[firefly]")} - ${config.name} already exists.`);
             return;
@@ -92,15 +88,38 @@ const questions = [
 
     /* Start copying template files to the destination */
     try {
-        createDirectory(config.name);
-        copyTemplate(template, config.name, {
-            "project-name": config.name,
-            "import-platform": injectSnippet(snippets, config.platform, "import-platform"),
-            "define-platform": injectSnippet(snippets, config.platform, "define-platform"),
-            "import-database": injectSnippet(snippets, config.database, "import-database"),
-            "define-database": injectSnippet(snippets, config.database, "define-database"),
-            "define-options": `{ platform${config.database != "none" ? ", database" : ""} }`
-        });
+        /* find the template paths */
+        const templatePath = path.join(__dirname, "../templates/", config.language);
+        const snippetPath = path.join(__dirname, "../templates/snippets");
+
+        const template = new TemplateBuilder(templatePath, config.name);
+
+        /* inject global template variables */
+        template.inject("project-name", config.name);
+        template.inject("options", (config.database != "none") ? "{ platform, database }" : "{ platform }");
+
+        /* apply platform snippets to the template */
+        if (config.platform.startsWith("custom")) {
+            template.snippet("import-platform", path.join(snippetPath, config.platform, config.language, "import-platform.template"));
+            template.snippet("define-platform", path.join(snippetPath, config.platform, config.language, "define-platform.template"));
+        } else {
+            template.snippet("import-platform", path.join(snippetPath, config.platform, "import-platform.template"));
+            template.snippet("define-platform", path.join(snippetPath, config.platform, "define-platform.template"));
+        }
+
+        /* apply the database snippets to the template */
+        if (config.database.startsWith("custom")) {
+            template.snippet("import-database", path.join(snippetPath, config.database, config.language, "import-database.template"));
+            template.snippet("define-database", path.join(snippetPath, config.database, config.language, "define-database.template"));
+        } else if (config.database != "none") {
+            template.snippet("import-database", path.join(snippetPath, config.database, "import-database.template"));
+            template.snippet("define-database", path.join(snippetPath, config.database, "define-database.template"));
+        } else {
+            template.inject("import-database", "");
+            template.inject("define-database", "");
+        }
+
+        template.build();
     } catch (error) {
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
         return;
@@ -112,7 +131,7 @@ const questions = [
         if (!skipGit) await intitializeGitRepository(config.name);
     } catch (error) {
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
-        deleteDirectory(config.name);
+        TemplateBuilder.deleteDirectory(config.name);
         return;
     }
 

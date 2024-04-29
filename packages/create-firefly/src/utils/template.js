@@ -1,71 +1,92 @@
 import path from "path";
 import fs from "fs";
 
-/* create a directory */
-export function createDirectory(directory) {
-    if (!fs.existsSync(directory)) {
-        fs.mkdirSync(directory, { recursive: true });
+/* template builder object */
+export class TemplateBuilder {
+
+    constructor(src, dest) {
+        this.src = src;
+        this.dest = dest;
+        this.values = {};
     }
-}
 
-/* deletes a directory and all subdirectories and files */
-export function deleteDirectory(directory) {
-    if (fs.existsSync(directory)) {
-        const files = fs.readdirSync(directory);
+    inject(marker, value) {
+        this.values[marker] = value;
+        return this;
+    }
 
-        for (let file of files) {
-            const filepath = path.join(directory, file);
+    snippet(marker, snippet) {
+        this.values[marker] = fs.readFileSync(snippet, "utf8");
+        return this;
+    }
 
-            if (fs.statSync(filepath).isDirectory()) {
-                deleteDirectory(filepath);
-            } else {
-                fs.unlinkSync(filepath);
+    build() {
+        TemplateBuilder.createDirectory(this.dest);
+        TemplateBuilder.copyTemplate(this.src, this.dest, this.values);
+        return this;
+    }
+
+    /* create a directory */
+    static createDirectory(directory) {
+        if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, { recursive: true });
+        }
+    }
+
+    /* deletes a directory and all subdirectories and files */
+    static deleteDirectory(directory) {
+        if (fs.existsSync(directory)) {
+            const files = fs.readdirSync(directory);
+
+            for (let file of files) {
+                const filepath = path.join(directory, file);
+
+                if (fs.statSync(filepath).isDirectory()) {
+                    TemplateBuilder.deleteDirectory(filepath);
+                } else {
+                    fs.unlinkSync(filepath);
+                }
+            }
+
+            fs.rmdirSync(directory);
+        }
+    }
+
+    /* copy a template and apply dynamic values to template markers */
+    static copyTemplate(src, dest, values) {
+        const filesToCreate = fs.readdirSync(src);
+
+        /* render the data into the templates */
+        const render = (content) => {
+            const keys = Object.keys(values);
+
+            for (let key of keys) {
+                content = content.replace(new RegExp(`{{${key}}}`, "g"), values[key]);
+            }
+
+            return content;
+        };
+
+        for (let file of filesToCreate) {
+            const originalPath = path.join(src, file);
+
+            if (file.endsWith(".template")) {
+                file = file.replace(/.template$/, "");
+            }
+
+            const newPath = path.join(dest, file);
+            const stats = fs.statSync(originalPath);
+
+            if (stats.isFile()) {
+                if (path.extname(originalPath) == ".template") {
+                    fs.writeFileSync(newPath, render(fs.readFileSync(originalPath, "utf8")));
+                } else {
+                    fs.writeFileSync(newPath, fs.readFileSync(originalPath));
+                }
+            } else if (stats.isDirectory()) {
+                TemplateBuilder.createDirectory(newPath);
+                TemplateBuilder.copyTemplate(originalPath, newPath, values);
             }
         }
-
-        fs.rmdirSync(directory);
     }
-}
-
-/* copy a template into the desired destination */
-export function copyTemplate(src, dest, values = {}) {
-    const filesToCreate = fs.readdirSync(src);
-
-    /* render the data into the templates */
-    const render = (content) => {
-        const keys = Object.keys(values);
-
-        for (let key of keys) {
-            content = content.replace(new RegExp(`{{${key}}}`, "g"), values[key]);
-        }
-
-        return content;
-    };
-
-    for (let file of filesToCreate) {
-        const originalPath = path.join(src, file);
-
-        if (file.endsWith(".template")) {
-            file = file.replace(/.template$/, "");
-        }
-
-        const newPath = path.join(dest, file);
-        const stats = fs.statSync(originalPath);
-
-        if (stats.isFile()) {
-            if (path.extname(originalPath) == ".template") {
-                fs.writeFileSync(newPath, render(fs.readFileSync(originalPath, "utf8")));
-            } else {
-                fs.writeFileSync(newPath, fs.readFileSync(originalPath));
-            }
-        } else if (stats.isDirectory()) {
-            createDirectory(newPath);
-            copyTemplate(originalPath, newPath, values);
-        }
-    }
-}
-
-export function injectSnippet(directory, snippet, key) {
-    if (snippet == "none") return "";
-    return fs.readFileSync(path.join(directory, snippet, key + ".template"), "utf8");
 }

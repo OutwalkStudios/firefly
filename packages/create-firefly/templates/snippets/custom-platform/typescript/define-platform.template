@@ -1,0 +1,11 @@
+/* implement a platform using the firefly platform interface */
+class CustomPlatform extends Platform {
+    
+    loadController(route: string, middleware: Function[], routes: Route[]): void {}
+
+    loadErrorHandler(): void {}
+
+    listen(port: number): void {}
+}
+
+const platform = new CustomPlatform();
