@@ -24,20 +24,20 @@ Firefly provides a clean and scalable architecture enabling you to quickly build
 You can create a new project by running the following command. This prompts for project choices then will generate your new project, install the required dependencies, and initialize a new git repository.
 
 ```
-$ npm create @outwalk/firefly
+npm create @outwalk/firefly
 ```
 
-### Run The Application
+### Run the Application
 
 Firefly provides commands to build and run your application for development and production.
-You can start with the `dev` command which will build the project, watch for changes, and reload the node process whenever you make a change.
+You can start with the dev command which will build the project, watch for changes, and reload the node process whenever you make a change.
 
 ```
 # navigate to the project folder
-$ cd <app-name>
+cd <app-name>
 
 # launch the project in development mode
-$ npm run dev
+npm run dev
 ```
 
 ---
