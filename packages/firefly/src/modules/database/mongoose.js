@@ -6,12 +6,15 @@ export class MongooseDriver extends Database {
 
     constructor(options = {}) {
         super();
-        
+
         this.options = options;
         this.url = options.url ?? process.env.DATABASE_URL;
     }
 
-    plugin(plugin) { mongoose.plugin(plugin); }
+    plugin(plugin) {
+        if (plugin instanceof Promise) mongoose.plugin(async () => await plugin);
+        else mongoose.plugin(plugin);
+    }
 
     async connect() {
         await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
@@ -24,7 +27,7 @@ export function Entity(options = {}) {
     return (target) => {
         /* remove the prototype chain, this enables extending Model */
         const entity = new Object();
-        entity.constructor._props= target._props;
+        entity.constructor._props = target._props;
 
         /* update the schema with default property values */
         const props = Object.entries(entity).filter(([key, value]) => target._props[key] && value != undefined);
