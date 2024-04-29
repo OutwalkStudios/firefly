@@ -36,7 +36,7 @@ The first argument passed to the command will be used as the project name/direct
 # Specify the database
 -d, --database
 
-# Prevnt automatic dependency installation
+# Prevent automatic dependency installation
 --skip-install
 
 # Prevent initilizing a new git repository
