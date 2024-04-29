@@ -21,7 +21,7 @@ Firefly provides a clean and scalable architecture enabling you to quickly build
 
 ### Create a new Project
 
-You can create a new project by running `npm create @outwalk/firefly`. This prompt for project choices then generate your new project, install the required dependencies, and initialize a new git repository.
+You can create a new project by running the following command. This prompts for project choices then will generate your new project, install the required dependencies, and initialize a new git repository.
 
 ```
 $ npm create @outwalk/firefly
