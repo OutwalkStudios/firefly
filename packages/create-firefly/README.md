@@ -13,13 +13,13 @@ A scaffolding tool for creating Firefly projects.
 Create a Firefly project by running the following command and then follow the prompts.
 
 ```
-$ npm create @outwalk/firefly
+npm create @outwalk/firefly
 ```
 
 You can also specify settings via command line options.
 
 ```
-$ npm create @outwalk/firefly my-app --language typescript
+npm create @outwalk/firefly my-app --language typescript
 ```
 
 ### Command Line Options.
@@ -35,6 +35,15 @@ The first argument passed to the command will be used as the project name/direct
 
 # Specify the database
 -d, --database
+
+# Prevnt automatic dependency installation
+--skip-install
+
+# Prevent initilizing a new git repository
+--skip-git
+
+# Ignore any warnings (dangerous)
+--force
 ```
 ---
 
