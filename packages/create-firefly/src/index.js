@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import yargs from "yargs-parser";
 import prompts from "prompts";
 import chalk from "chalk";
