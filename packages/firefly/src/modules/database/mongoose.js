@@ -17,6 +17,8 @@ export class MongooseDriver extends Database {
     }
 
     async connect() {
+        if (!this.url) throw new Error("You must provide a url to MongooseDriver.");
+        
         await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
         mongoose.connection.on("error", (error) => { throw error; });
     }
