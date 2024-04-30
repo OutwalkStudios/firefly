@@ -103,7 +103,7 @@ declare module "@outwalk/firefly/mongoose" {
     import type { SchemaOptions, Schema, ConnectOptions } from "mongoose";
     import type { Decorator, Database } from "@outwalk/firefly";
 
-    export function Entity(options?: { plugins?: []; } & SchemaOptions): Decorator;
+    export function Entity(options?: { plugins?: any[]; } & SchemaOptions): Decorator;
     export function Prop(type: Object | Schema): Decorator;
 
     export class MongooseDriver extends Database {
