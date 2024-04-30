@@ -63,6 +63,37 @@ export class TaskController {
 }
 ```
 
+### Middleware
+
+Controllers also have support for middleware via the `@Middleware()` decorator. This decorator can be applied to the entire controller or to specific routes.
+Any values passed into the decorator are associated with the appropriate routes and the underlying platform handles connecting them.
+
+In the following example we apply the `cors` middleware to both the entire controller and to the `getTasks` route method.
+
+**Example:**
+```js
+import { Controller, Middleware, Get } from "@outwalk/firefly";
+import cors from "cors";
+
+@Controller()
+@Middleware(cors())
+export class TaskController {
+
+    tasks = ["task 1", "task 2", "task 3"];
+
+    @Get()
+    @Middleware(cors())
+    getTasks() {
+        return this.tasks;
+    }
+
+    @Get("/:id")
+    getTaskById(req, res) {
+        return this.tasks.find((task) => task == req.params.id);
+    }
+}
+```
+
 ---
 
 ## Building Services
@@ -217,6 +248,15 @@ export class Task extends Model {
 }
 ```
 
+Mongoose plugins are supported via the `plugins` array option provided by the entity decorator.
+These plugins will only apply to the current entity.
+
+**Example:**
+```js
+import { Entity } from "@outwalk/firefly/mongoose";
+
+@Entity({ plugins: [import("mongoose-autopopulate")] })
+```
 ---
 
 ## Custom Integrations
