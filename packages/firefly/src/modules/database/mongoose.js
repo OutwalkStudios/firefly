@@ -11,8 +11,8 @@ export class MongooseDriver extends Database {
         this.url = options.url ?? process.env.DATABASE_URL;
     }
 
-    plugin(plugin) {
-        mongoose.plugin((plugin instanceof Promise) ? async () => await plugin : plugin);
+    async plugin(plugin) {
+        mongoose.plugin((plugin instanceof Promise) ? (await plugin).default : plugin);
     }
 
     async connect() {
@@ -26,6 +26,7 @@ export class MongooseDriver extends Database {
 /* a decorator to create a schema and return a model in mongoose */
 export function Entity(options = {}) {
     const plugins = options.plugins ?? [];
+
     return (target) => {
         /* remove the prototype chain, this enables extending Model */
         const entity = new Object();
@@ -38,7 +39,7 @@ export function Entity(options = {}) {
         const schema = new mongoose.Schema(target._props, options);
 
         /* apply plugins to the schema before compiling the model */
-        plugins.forEach((plugin) => schema.plugin((plugin instanceof Promise) ? async () => await plugin : plugin));
+        plugins.forEach(plugin => schema.plugin(plugin));
 
         return new mongoose.model(target.name, schema.loadClass(target));
     };
