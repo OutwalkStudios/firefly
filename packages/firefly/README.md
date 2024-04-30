@@ -33,12 +33,12 @@ npm install @outwalk/firefly
 
 ## Building Controllers
 
-Controllers are classes marked with `@Controller()` that are used to define your routes and handle incoming http requests. Controllers use file based routing by default, this means the route url will be the path relative to the `src` directory. For example creating `src/tasks/tasks.controller.js` will result in a route being created at `/tasks`. You can opt-out of file based routing by passing the route to the controller decorator.
+Controllers are classes marked with the `@Controller()` decorator that are used to define your routes and handle incoming http requests. Controllers use file based routing by default, this means the route url will be the path relative to the `src` directory. For example creating `src/tasks/tasks.controller.js` will result in a route being created at `/tasks`. You can opt-out of file based routing by passing the route to the controller decorator.
 
-Each route can be defined using an http method decorator, @outwalk/firefly provides a decorator for all http methods. If you want to do something more advanced, there is also the `@Http()` decorator that accepts a method and route. Each http decorator accepts a route argument that defaults to `/`.
+Each route can be defined using an http method decorator, Firefly provides a decorator for all http methods. If you want to do something more advanced, there is also the `@Http()` decorator that accepts a method and route argument. All standard http decorators accepts a route argument that defaults to `/`.
 
 Route methods recieve the platforms request and response objects as arguments. Additionally You can return responses
-directly from the route method. The returned value will be serialized and sent as the http response.
+directly from the route method. The returned value will be serialized and sent as the response.
 
 Controllers are only detected by Firefly when naming your files ending with `.controller.js`. Ex: `tasks.controller.js`.
 
@@ -67,7 +67,7 @@ export class TaskController {
 
 ## Building Services
 
-Services are classes marked with `@Injectable()` that are used to write business logic and interact with a database. Services are automatically available to other services and controllers through [dependency injection](#dependency-injection) with the `@Inject()` decorator.
+Services are classes marked with the `@Injectable()` decorator that are used to write business logic and interact with a database. Services are automatically available to controllers and other services through [dependency injection](#dependency-injection).
 
 Services are only detected by Firefly when naming your files ending with `.service.js`. Ex: `tasks.service.js`.
 
@@ -96,9 +96,9 @@ export class TaskService {
 
 Dependency injection is a a technique that allows objects to define their dependencies through instance properties and have them provided through the framework rather than constructing them itself. This works great for creating services to share business logic or share object values across different parts of the application.
 
-In Firefly you can define an object that can be injected using the `@Injectable()` decorator as outlined in [Building Services](#building-services). In order to inject a dependency we can use the `@Inject()` decorator inside a controller or service.
+In Firefly you can define an object that can be injected using the `@Injectable()` decorator as outlined in the [Building Services](#building-services) section. In order to inject a dependency we can use the `@Inject()` decorator inside a controller or service. The Inject decorator requires the property name to be the camlCase version of the service class name, otherwise the service can be imported and passed as an argument to the Inject decorator.
 
-In the following example we will utilze the service created in the previous section, and update the controller from [Building Controllers](#building-controllers) to use dependency injection.
+In the following example we will utilze the service created in the previous section, and update the controller from the [Building Controllers](#building-controllers) section to use dependency injection.
 
 **Example:**
 ```js
@@ -107,7 +107,7 @@ import { Controller, Inject, Get } from "@outwalk/firefly";
 @Controller()
 export class TaskController {
 
-    @Inject() tasksService;
+    @Inject() taskService;
 
     @Get()
     getTasks() {
@@ -125,9 +125,9 @@ export class TaskController {
 
 ## Error Handling
 
-Firefly has built-in error handling, you can throw an error from anywhere in the lifecycle and it will automatically catch it and by default respond with a 500 status code. Optionally you can use our provided error objects for throwing specific errors. Error objects are provided for all 4xx and 5xx status codes, and you can use `HttpError` to specify your own status code.
+Firefly has built-in error handling, you can throw an error from anywhere in the lifecycle and it will automatically catch it and respond with a 500 status code by default. Optionally you can use our provided error objects for throwing specific errors. Error objects are provided for all 4xx and 5xx status codes, and you can use `HttpError` to specify your own status code.
 
-In this example we update the service created in [Building Services](#building-services) to throw a 404 error when a task is not found.
+In this example we update the service created in the [Building Services](#building-services) section to throw a 404 error when a task is not found.
 
 **Example:**
 ```js
@@ -168,7 +168,6 @@ out of the box, Firefly provides a platform binding for express, enabling integr
 ```js
 import { Application } from "@outwalk/firefly";
 import { ExpressPlatform } from "@outwalk/firefly/express";
-
 import cors from "cors";
 
 /* setup the platform and global middleware */
