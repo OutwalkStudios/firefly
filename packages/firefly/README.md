@@ -248,9 +248,7 @@ export class Task extends Model {
 }
 ```
 
-Mongoose plugins are supported via the `plugins` array option provided by the entity decorator. These plugins will only apply to the current entity.
-
-**NOTE:** Schema plugins must be a static import.
+Mongoose plugins are supported via the `plugins` array option provided by the entity decorator. These plugins will only apply to the current entity. Its worth noting that schema plugins are required to be static imports because the Entity decorator is unable to resolve dynamic imports before the model is compiled.
 
 **Example:**
 ```js
