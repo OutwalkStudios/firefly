@@ -40,20 +40,53 @@ export function Entity(options = {}) {
 
 /* a decorator to define schema properties on an entity */
 export function Prop(type) {
+    const isObject = (obj) => obj != undefined && Object.getPrototypeOf(obj) === Object.prototype;
+    const isModel = (obj) => obj?.name == "model";
+
     /* process the type to resolve references to other models */
     const processType = (type) => {
-        if (type.name == "model") {
+        /* the type is a model */
+        if (isModel(type)) {
             return { type: mongoose.Types.ObjectId, ref: type.modelName };
         }
 
-        if (Array.isArray(type) && type[0].name == "model") {
-            return [{ type: mongoose.Types.ObjectId, ref: type[0].modelName }];
+        /* the type is an array */
+        if (Array.isArray(type)) {
+
+            /* the type is a nested model */
+            if (isObject(type[0])) {
+                type[0] = processType(type[0]);
+
+                return type;
+            }
+
+            /* subtype is a model */
+            if (isModel(type[0])) {
+                return [{ type: mongoose.Types.ObjectId, ref: type[0].modelName }];
+            }
         }
 
-        if (Object.getPrototypeOf(type) === Object.prototype) {
+        /* the type is an object */
+        if (isObject(type)) {
+
+            /* subtype is an array */
+            if (Array.isArray(type?.type)) {
+                type.type = processType(type.type);
+
+                return type;
+            }
+
+            /* subtype is a model */
+            if (isModel(type?.type)) {
+                type.ref = type.type.modelName;
+                type.type = mongoose.Types.ObjectId;
+
+                return type;
+            }
+
+            /* search the remaining properties and process them */
             for (let name of Object.getOwnPropertyNames(type)) {
                 type[name] = processType(type[name]);
-                if (name == "type") break;
             }
         }
 
