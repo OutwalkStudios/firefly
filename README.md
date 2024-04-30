@@ -12,8 +12,8 @@ Firefly provides a clean and scalable architecture enabling you to quickly build
 ## Documentation
 
 * [Getting Started](#getting-started)
-* [API Documentation](https://github.com/OutwalkStudios/firefly/tree/main/packages/firefly)
-* [CLI Documentation](https://github.com/OutwalkStudios/firefly/tree/main/packages/firefly)
+* [API Documentation](https://github.com/OutwalkStudios/firefly/tree/main/packages/firefly#table-of-contents)
+* [CLI Documentation](https://github.com/OutwalkStudios/firefly/tree/main/packages/firefly#cli-commands)
 
 ---
 
