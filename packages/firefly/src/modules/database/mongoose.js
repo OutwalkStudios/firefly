@@ -12,13 +12,12 @@ export class MongooseDriver extends Database {
     }
 
     plugin(plugin) {
-        if (plugin instanceof Promise) mongoose.plugin(async () => await plugin);
-        else mongoose.plugin(plugin);
+        mongoose.plugin((plugin instanceof Promise) ? async () => await plugin : plugin);
     }
 
     async connect() {
         if (!this.url) throw new Error("You must provide a url to MongooseDriver.");
-        
+
         await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
         mongoose.connection.on("error", (error) => { throw error; });
     }
@@ -26,6 +25,7 @@ export class MongooseDriver extends Database {
 
 /* a decorator to create a schema and return a model in mongoose */
 export function Entity(options = {}) {
+    const plugins = options.plugins ?? [];
     return (target) => {
         /* remove the prototype chain, this enables extending Model */
         const entity = new Object();
@@ -36,6 +36,10 @@ export function Entity(options = {}) {
         props.forEach(([key, value]) => target._props[key] = { type: target._props[key], default: value });
 
         const schema = new mongoose.Schema(target._props, options);
+
+        /* apply plugins to the schema before compiling the model */
+        plugins.forEach((plugin) => schema.plugin((plugin instanceof Promise) ? async () => await plugin : plugin));
+
         return new mongoose.model(target.name, schema.loadClass(target));
     };
 }
