@@ -248,14 +248,16 @@ export class Task extends Model {
 }
 ```
 
-Mongoose plugins are supported via the `plugins` array option provided by the entity decorator.
-These plugins will only apply to the current entity.
+Mongoose plugins are supported via the `plugins` array option provided by the entity decorator. These plugins will only apply to the current entity.
+
+**NOTE:** Schema plugins must be a static import.
 
 **Example:**
 ```js
 import { Entity } from "@outwalk/firefly/mongoose";
+import mongooseAutoPopulate from "mongoose-autopopulate";
 
-@Entity({ plugins: [import("mongoose-autopopulate")] })
+@Entity({ plugins: [mongooseAutoPopulate] })
 ```
 ---
 
