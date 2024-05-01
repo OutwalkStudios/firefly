@@ -15,6 +15,11 @@ export default async function start(args) {
     /* wait until a file exists */
     const wait = (pathname) => {
         return new Promise((resolve) => {
+            /* if the directory does not yet exist, we need to create it */
+            if (!fs.existsSync(path.dirname(pathname))) {
+                fs.mkdirSync(path.dirname(pathname));
+            }
+            
             const watcher = fs.watch(path.dirname(pathname), (event, filename) => {
                 if (event == "rename" && filename == path.basename(pathname)) {
                     if (fs.existsSync(pathname)) {
