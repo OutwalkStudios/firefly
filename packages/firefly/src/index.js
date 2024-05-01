@@ -38,8 +38,9 @@ export class Application {
     }
 }
 
-
 export * from "./modules/core/controller";
 export * from "./modules/core/injectable";
 export * from "./modules/platform/platform";
 export * from "./modules/database/database";
+
+export { Init } from "./modules/core/router";

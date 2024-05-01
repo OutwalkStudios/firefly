@@ -1,6 +1,17 @@
 import path from "path";
 import fs from "fs";
 
+/* a decorator to apply the constructor behavior to a method */
+export function Init() {
+    return (target, key) => {
+        if (target._initMethod != undefined) {
+            throw new Error("A class can only define one constructor method with @Init()");
+        }
+
+        target._initMethod = key;
+    };
+}
+
 /* load and return the injectables */
 export async function loadInjectables(directory, root = true) {
     const injectables = {};
@@ -21,11 +32,17 @@ export async function loadInjectables(directory, root = true) {
                 if (!exports[name]?._injectable) continue;
 
                 const injectable = new exports[name]();
+
+                /* check for an already existing injectable with this name */
+                if (injectables[name]) {
+                    throw new Error(`The ${name} injectable already exists and must be unique.`);
+                }
+
                 injectables[name] = injectable;
 
                 /* run the injectable init function if the injectable does not have any child injectables */
-                if (typeof injectable.init == "function" && !injectable?._injected) {
-                    await injectable.init();
+                if (injectable._initMethod && !injectable?._injected) {
+                    await injectable[injectable._initMethod]();
                 }
             }
 
@@ -40,7 +57,7 @@ export async function loadInjectables(directory, root = true) {
                 injectable[inject.propertyKey] = injectables[inject.injectableKey];
             }
 
-            if (typeof injectable.init == "function") await injectable.init();
+            if (injectable._initMethod) await injectable[injectable._initMethod]();
         }
     }
 
@@ -48,20 +65,20 @@ export async function loadInjectables(directory, root = true) {
 }
 
 /* load and return the controllers */
-export async function loadControllers(rootDirectory, currentDirectory, injectables) {
+export async function loadControllers(root, directory, injectables) {
     const controllers = {};
 
-    const routes = fs.readdirSync(currentDirectory);
+    const routes = fs.readdirSync(directory);
     for (let route of routes) {
-        const stat = fs.statSync(path.join(currentDirectory, route));
+        const stat = fs.statSync(path.join(directory, route));
 
         if (stat.isDirectory()) {
-            const resolved = await loadControllers(rootDirectory, path.join(currentDirectory, route), injectables);
+            const resolved = await loadControllers(root, path.join(directory, route), injectables);
             Object.assign(controllers, resolved);
         }
 
         else if (stat.isFile() && route.endsWith(".controller.js")) {
-            const exports = await import(path.join(path.relative(__dirname, currentDirectory), route));
+            const exports = await import(path.join(path.relative(__dirname, directory), route));
 
             for (let name of Object.keys(exports)) {
                 if (!exports[name]?._controller) continue;
@@ -75,7 +92,7 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
                 }
 
                 /* run the controller init function */
-                if (typeof controller.init == "function") await controller.init();
+                if (controller._initMethod) await controller[controller._initMethod]();
 
                 /* assign the middleware and bind the context to the controller */
                 for (let route of controller._routes) {
@@ -83,8 +100,13 @@ export async function loadControllers(rootDirectory, currentDirectory, injectabl
                     route.handler = route.handler.bind(controller);
                 }
 
-                const fileRoute = currentDirectory.split(rootDirectory).at(-1);
+                const fileRoute = directory.split(root).at(-1);
                 const endpoint = exports[name]._route ?? fileRoute.length > 0 ? fileRoute : "/";
+
+                /* check for an already existing controller at this endpoint */
+                if (controllers[endpoint]) {
+                    throw new Error(`The ${name} controller uses the route ${endpoint} which already exists.`);
+                }
 
                 controllers[endpoint] = { middleware: middleware, routes: controller._routes };
             }

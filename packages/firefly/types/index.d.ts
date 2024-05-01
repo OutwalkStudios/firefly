@@ -26,6 +26,8 @@ declare module "@outwalk/firefly" {
         listen(port?: number): Promise<void>;
     }
 
+    export function Init(): Decorator;
+
     export function Controller(route?: string): Decorator;
     export function Http(method: string, route?: string): Decorator;
     export function Head(route?: string): Decorator;
