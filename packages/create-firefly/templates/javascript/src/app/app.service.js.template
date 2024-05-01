@@ -1,9 +1,0 @@
-import { Injectable } from "@outwalk/firefly";
-
-@Injectable()
-export class AppService {
-
-    getHelloWorld() {
-        return "Hello World!";
-    }
-}

@@ -1,0 +1,10 @@
+import { Controller, Get } from "@outwalk/firefly";
+
+@Controller()
+export class IndexController {
+
+    @Get()
+    getHelloWorld() {
+        return "Hello World!";
+    }
+}
