@@ -9,8 +9,9 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
-import del from "rollup-plugin-delete";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
+
+import { deleteDirectory } from "../utils/files";
 
 const green = chalk.hex("#ADFF2F");
 
@@ -32,6 +33,9 @@ export default async function build(args) {
         /* determine the node version being targeted */
         const [version] = (engines?.node ?? process.versions.node.split(".")[0]).match(/\d+[^.|]/g);
 
+        /* delete existing files in the dist folder */
+        deleteDirectory(dist, false);
+
         /* determine the input files */
         const files = globSync("src/**/*.{js,ts}").map((file) => [
             path.relative("src", file.slice(0, file.length - path.extname(file).length)),
@@ -50,8 +54,7 @@ export default async function build(args) {
                 typescriptPaths({ preserveExtensions: true, tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
                 resolve(),
                 commonjs(),
-                json(),
-                del({ targets: `${dist}/*`, runOnce: isDev })
+                json()
             ]
         };
 
@@ -70,12 +73,12 @@ export default async function build(args) {
         const watcher = rollup.watch(config);
 
         watcher.on("event", (event) => {
-            switch(event.code) {
+            switch (event.code) {
                 case "BUNDLE_END":
                     console.log(`${green("[firefly]")} - build completed.`);
                     event.result.close();
                     break;
-                
+
                 case "ERROR":
                     console.log(`${chalk.red("[firefly]")} - ${event.error.message}`);
                     if (event.error.frame) console.log(event.error.frame);
