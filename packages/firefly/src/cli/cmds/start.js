@@ -18,7 +18,6 @@ export default async function start(args) {
             const watcher = fs.watch(path.dirname(pathname), (event, filename) => {
                 if (event == "rename" && filename == path.basename(pathname)) {
                     if (fs.existsSync(pathname)) {
-                        console.log(pathname, fs.existsSync(pathname));
                         watcher.close();
                         resolve();
                     }
@@ -41,7 +40,7 @@ export default async function start(args) {
             build(args),
             wait(main).then(() => {
                 nodemon(`${flags.join(" ")} ${main}`);
-                
+
                 nodemon.on("crash", () => console.log(`${chalk.red("[firefly]")} - failed to reload the application.`));
                 nodemon.on("quit", () => process.exit());
             })

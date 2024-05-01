@@ -12,5 +12,4 @@ export function deleteDirectory(directory, deleteRoot = true) {
     }
 
     if (deleteRoot) fs.rmdirSync(directory);
-    console.log("deleted directory");
 }
