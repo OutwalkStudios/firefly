@@ -12,6 +12,19 @@ export default async function start(args) {
     /* set the node environment */
     process.env.NODE_ENV = isDev ? "development" : "production";
 
+    /* wait until a file exists */
+    const wait = (pathname) => {
+        const [directory, file] = pathname.split("/");
+
+        return new Promise((resolve) => {
+            fs.watch(directory, (event, filename) => {
+                if (event == "rename" && filename == file) {
+                    resolve();
+                }
+            });
+        });
+    };
+
     try {
         const { main } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
         const flags = ["-r dotenv/config"];
@@ -24,7 +37,7 @@ export default async function start(args) {
 
         Promise.all([
             build(args),
-            nodemon(`${flags.join(" ")} ${main}`)
+            wait(main).then(() => nodemon(`${flags.join(" ")} ${main}`))
         ]);
 
         nodemon.on("crash", () => console.log(`${chalk.red("[firefly]")} - failed to reload the application.`));
