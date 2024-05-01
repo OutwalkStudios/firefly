@@ -59,6 +59,7 @@
     "glob": "^10.3.12",
     "nodemon": "^3.1.0",
     "rollup": "^4.14.1",
+    "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-esbuild": "^6.1.1",
     "rollup-plugin-typescript-paths": "^1.5.0",
     "yargs-parser": "^21.1.1"

@@ -9,6 +9,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
+import del from "rollup-plugin-delete";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 
 const green = chalk.hex("#ADFF2F");
@@ -50,6 +51,7 @@ export default async function build(args) {
                 resolve(),
                 commonjs(),
                 json(),
+                del({ targets: `${dist}/*`, runOnce: isDev })
             ]
         };
 
