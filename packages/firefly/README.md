@@ -257,6 +257,17 @@ import mongooseAutoPopulate from "mongoose-autopopulate";
 
 @Entity({ plugins: [mongooseAutoPopulate] })
 ```
+
+Firefly also provides support for defining an index on the Mongoose schema. This can be done via the `@Index()` decorator.
+
+**Example:**
+```js
+import { Entity, Index } from "@outwalk/firefly/mongoose";
+
+@Entity()
+@Index({ name: "text" }, { weights: { name: 10 } })
+```
+
 ---
 
 ## Custom Integrations

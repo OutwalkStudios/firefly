@@ -38,10 +38,21 @@ export function Entity(options = {}) {
 
         const schema = new mongoose.Schema(target._props, options);
 
+        /* apply indexes to the schema before compiling the model */
+        (target._indexes ?? []).forEach((index) => schema.index(...index));
+
         /* apply plugins to the schema before compiling the model */
         plugins.forEach(plugin => schema.plugin(plugin));
 
         return new mongoose.model(target.name, schema.loadClass(target));
+    };
+}
+
+/* a decorator to define an index on the database */
+export function Index(...index) {
+    return (target) => {
+        target._indexes = target._indexes ?? [];
+        target._indexes.push(index);
     };
 }
 

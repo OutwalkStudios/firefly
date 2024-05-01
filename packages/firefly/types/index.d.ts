@@ -95,7 +95,7 @@ declare module "@outwalk/firefly/express" {
         protected loadErrorHandler(): void;
         protected listen(port: number): void;
 
-        use(middleware: any): void;
+        use(...middleware: any[]): void;
     }
 }
 
@@ -104,6 +104,7 @@ declare module "@outwalk/firefly/mongoose" {
     import type { Decorator, Database } from "@outwalk/firefly";
 
     export function Entity(options?: { plugins?: any[]; } & SchemaOptions): Decorator;
+    export function Index(...index: any[]): Decorator;
     export function Prop(type: Object | Schema): Decorator;
 
     export class MongooseDriver extends Database {
