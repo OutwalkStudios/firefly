@@ -13,7 +13,7 @@ export class ExpressPlatform extends Platform {
         this.app.use(express.json());
     }
 
-    use(middleware) { this.app.use(middleware); }
+    use(...middleware) { this.app.use(...middleware); }
     listen(port) { this.app.listen(port); }
 
     loadController(route, middleware, routes) {
@@ -28,9 +28,9 @@ export class ExpressPlatform extends Platform {
                     if (result == undefined) return;
 
                     const status = (route.method == "post") ? 201 : 200;
-                    const data = (typeof result === "object") ? JSON.stringify(result) : result;
+                    const method = (typeof result === "object") ? "json" : "send";
 
-                    res.status(status).send(data);
+                    res.status(status)[method](result);
                 } catch (error) {
                     next(error);
                 }
