@@ -22,7 +22,15 @@ export async function loadInjectables(directory, root = true) {
 
         if (stat.isDirectory()) {
             const resolved = await loadInjectables(path.join(directory, route), false);
-            Object.assign(injectables, resolved);
+
+            /* merge the injectable objects while checking for duplicates */
+            Object.keys(resolved).forEach((key) => {
+                if (injectables[key]) {
+                    throw new Error(`The ${key} injectable already exists and must be unique.`);
+                }
+
+                injectables[key] = resolved[key];
+            });
         }
 
         else if (stat.isFile() && route.endsWith(".service.js")) {
@@ -32,12 +40,6 @@ export async function loadInjectables(directory, root = true) {
                 if (!exports[name]?._injectable) continue;
 
                 const injectable = new exports[name]();
-
-                /* check for an already existing injectable with this name */
-                if (injectables[name]) {
-                    throw new Error(`The ${name} injectable already exists and must be unique.`);
-                }
-
                 injectables[name] = injectable;
 
                 /* run the injectable init function if the injectable does not have any child injectables */
@@ -74,7 +76,14 @@ export async function loadControllers(root, directory, injectables) {
 
         if (stat.isDirectory()) {
             const resolved = await loadControllers(root, path.join(directory, route), injectables);
-            Object.assign(controllers, resolved);
+            /* merge the controller objects while checking for duplicates */
+            Object.keys(resolved).forEach((key) => {
+                if (controllers[key]) {
+                    throw new Error(`${controllers[key].name} uses the ${key} route which already exists.`);
+                }
+
+                controllers[key] = resolved[key];
+            });
         }
 
         else if (stat.isFile() && route.endsWith(".controller.js")) {
@@ -84,10 +93,10 @@ export async function loadControllers(root, directory, injectables) {
                 if (!exports[name]?._controller) continue;
 
                 const controller = new exports[name]();
-                const middleware = (exports[name]?._middleware?.class) || [];
+                const middleware = exports[name]?._middleware?.class || [];
 
                 /* inject any injectables */
-                for (let injectable of controller._injected ?? []) {
+                for (let injectable of (controller._injected ?? [])) {
                     controller[injectable.propertyKey] = injectables[injectable.injectableKey];
                 }
 
@@ -95,20 +104,15 @@ export async function loadControllers(root, directory, injectables) {
                 if (controller._initMethod) await controller[controller._initMethod]();
 
                 /* assign the middleware and bind the context to the controller */
-                for (let route of controller._routes) {
+                for (let route of (controller._routes ?? [])) {
                     route.middleware = controller._middleware?.[route.handler.name] ?? [];
                     route.handler = route.handler.bind(controller);
                 }
 
                 const fileRoute = directory.split(root).at(-1);
-                const endpoint = exports[name]._route ?? fileRoute.length > 0 ? fileRoute : "/";
+                const endpoint = exports[name]._route ?? (fileRoute.length > 0 ? fileRoute : "/");
 
-                /* check for an already existing controller at this endpoint */
-                if (controllers[endpoint]) {
-                    throw new Error(`The ${name} controller uses the route ${endpoint} which already exists.`);
-                }
-
-                controllers[endpoint] = { middleware: middleware, routes: controller._routes };
+                controllers[endpoint] = { name: name, middleware: middleware, routes: controller._routes ?? [] };
             }
         }
     }
