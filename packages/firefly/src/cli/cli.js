@@ -3,6 +3,7 @@
 import "dotenv/config";
 
 import yargs from "yargs-parser";
+import chalk from "chalk";
 import version from "./cmds/version";
 import help from "./cmds/help";
 import build from "./cmds/build";
@@ -24,4 +25,8 @@ const commands = {
     "start": start
 };
 
-if (commands[cmd]) commands[cmd](args);
+try {
+    if (commands[cmd]) commands[cmd](args);
+} catch (error) {
+    console.error(`${chalk.red(`[firefly]`)} - ${error.message}`);
+}
