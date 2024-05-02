@@ -26,7 +26,7 @@ export async function loadInjectables(directory, root = true) {
             /* merge the injectable objects while checking for duplicates */
             Object.keys(resolved).forEach((key) => {
                 if (injectables[key]) {
-                    throw new Error(`The ${key} injectable already exists and must be unique.`);
+                    throw new Error(`Injectable "${key}" already exists and must be unique.`);
                 }
 
                 injectables[key] = resolved[key];
@@ -79,7 +79,7 @@ export async function loadControllers(root, directory, injectables) {
             /* merge the controller objects while checking for duplicates */
             Object.keys(resolved).forEach((key) => {
                 if (controllers[key]) {
-                    throw new Error(`${controllers[key].name} uses the ${key} route which already exists.`);
+                    throw new Error(`Controller "${controllers[key].name}" uses the route "${key}" which already exists.`);
                 }
 
                 controllers[key] = resolved[key];
