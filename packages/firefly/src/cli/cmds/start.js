@@ -1,11 +1,11 @@
-import chalk from "chalk";
 import nodemon from "nodemon";
 import { execSync } from "child_process";
 import build from "./build";
 import path from "path";
 import fs from "fs";
 
-import { loadPackage } from "../utils/files";
+import { loadPackage } from "../../utils/files";
+import { logger } from "../../utils/logging";
 
 /* build the project for production */
 export default async function start(args) {
@@ -48,12 +48,12 @@ export default async function start(args) {
             wait(main).then(() => {
                 nodemon(`${flags.join(" ")} ${main}`);
 
-                nodemon.on("crash", () => console.log(`${chalk.red("[firefly]")} - failed to reload the application.`));
+                nodemon.on("crash", () => logger.error("failed to reload the application."));
                 nodemon.on("quit", () => process.exit());
             })
         ]);
 
     } catch (error) {
-        console.error(`${chalk.red("[firefly]")} - ${error.message}`);
+        logger.error(error.message);
     }
 }

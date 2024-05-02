@@ -3,11 +3,12 @@
 import "dotenv/config";
 
 import yargs from "yargs-parser";
-import chalk from "chalk";
 import version from "./cmds/version";
 import help from "./cmds/help";
 import build from "./cmds/build";
 import start from "./cmds/start";
+
+import { logger } from "../utils/logging";
 
 /* parse the cli arguments */
 const args = yargs(process.argv.slice(2));
@@ -28,5 +29,5 @@ const commands = {
 try {
     if (commands[cmd]) commands[cmd](args);
 } catch (error) {
-    console.error(`${chalk.red(`[firefly]`)} - ${error.message}`);
+    logger.error(error.message);
 }

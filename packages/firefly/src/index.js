@@ -1,7 +1,6 @@
 import { loadInjectables, loadControllers } from "./modules/core/router";
-import chalk from "chalk";
-import path from "path";
-import fs from "fs";
+import { loadPackage } from "./utils/files";
+import { logger } from "./utils/logging";
 
 export class Application {
 
@@ -13,11 +12,14 @@ export class Application {
     async listen(port = process.env.PORT ?? 8080) {
         try {
             /* determine the location to load routes from */
-            const { main } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
+            const { main } = loadPackage();
             const root = main.split("/")[0];
 
             /* if a database driver is provided, run the connect method */
-            if (this.database) await this.database.connect();
+            if (this.database) {
+                logger.log("connecting to database...");
+                await this.database.connect();
+            }
 
             /* load the injectables and controllers from the filesystem */
             const injectables = await loadInjectables(root);
@@ -32,8 +34,9 @@ export class Application {
 
             /* start the web server */
             this.platform.listen(port);
+            logger.log(`running on http://localhost:${port}`);
         } catch (error) {
-            console.error(`${chalk.red("[firefly]")} - ${error.message}`);
+            logger.error(error.message);
         }
     }
 }

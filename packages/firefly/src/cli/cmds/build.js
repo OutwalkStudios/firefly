@@ -1,7 +1,6 @@
 import { globSync } from "glob";
 import module from "module";
 import rollup from "rollup";
-import chalk from "chalk";
 import chokidar from "chokidar";
 import path from "path";
 import fs from "fs";
@@ -12,9 +11,8 @@ import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 
-import { loadPackage, deleteDirectory } from "../utils/files";
-
-const green = chalk.hex("#ADFF2F");
+import { loadPackage, deleteDirectory } from "../../utils/files";
+import { logger } from "../../utils/logging";
 
 /* build the project for production */
 export default async function build(args) {
@@ -24,7 +22,7 @@ export default async function build(args) {
     process.env.NODE_ENV = isDev ? "development" : "production";
 
     try {
-        console.log(`${green("[firefly]")} - building the project...`);
+        logger.log("building the project...");
 
         /* get the projects package.json and determine language */
         const { main, engines, dependencies } = loadPackage();
@@ -69,7 +67,7 @@ export default async function build(args) {
             await bundle.write(config.output);
             await bundle.close();
 
-            console.log(`${green("[firefly]")} - build completed.`);
+            logger.log("build completed.");
             return;
         }
 
@@ -82,17 +80,17 @@ export default async function build(args) {
             watcher.on("event", (event) => {
                 switch (event.code) {
                     case "BUNDLE_END":
-                        console.log(`${green("[firefly]")} - build completed.`);
+                        logger.log("build completed.");
                         event.result.close();
                         break;
 
                     case "ERROR":
-                        console.log(`${chalk.red("[firefly]")} - ${event.error.message}`);
+                        logger.error(event.error.message);
                         if (event.error.frame) console.log(event.error.frame);
                         break;
 
                     case "FATAL":
-                        console.log(`${chalk.red("[firefly]")} - fatal error occurred.`);
+                        logger.error("fatal error occurred.");
                         process.exit(1);
                 }
             });
@@ -108,7 +106,7 @@ export default async function build(args) {
         startWatchMode();
 
     } catch (error) {
-        console.error(`${chalk.red("[firefly]")} - ${error.message}`);
+        logger.error(error.message);
         if (error.frame) console.log(error.frame);
     }
 }
