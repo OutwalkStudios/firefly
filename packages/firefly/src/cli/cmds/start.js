@@ -5,6 +5,8 @@ import build from "./build";
 import path from "path";
 import fs from "fs";
 
+import { loadPackage } from "../utils/files";
+
 /* build the project for production */
 export default async function start(args) {
     const isDev = (args.dev || args.d);
@@ -32,7 +34,7 @@ export default async function start(args) {
     };
 
     try {
-        const { main } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
+        const { main } = loadPackage();
         const flags = ["-r dotenv/config"];
 
         if (!isDev) {

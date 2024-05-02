@@ -12,7 +12,7 @@ import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 
-import { deleteDirectory } from "../utils/files";
+import { loadPackage, deleteDirectory } from "../utils/files";
 
 const green = chalk.hex("#ADFF2F");
 
@@ -27,7 +27,7 @@ export default async function build(args) {
         console.log(`${green("[firefly]")} - building the project...`);
 
         /* get the projects package.json and determine language */
-        const { main, engines, dependencies } = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json")));
+        const { main, engines, dependencies } = loadPackage();
         const isTypeScript = fs.existsSync(path.join(process.cwd(), "tsconfig.json"));
         const dist = main.split("/")[0];
 
