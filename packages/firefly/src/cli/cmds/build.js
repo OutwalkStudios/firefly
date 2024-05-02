@@ -2,6 +2,7 @@ import { globSync } from "glob";
 import module from "module";
 import rollup from "rollup";
 import chalk from "chalk";
+import chokidar from "chokidar";
 import path from "path";
 import fs from "fs";
 
@@ -37,13 +38,17 @@ export default async function build(args) {
         deleteDirectory(dist, false);
 
         /* determine the input files */
-        const files = globSync("src/**/*.{js,ts}").map((file) => [
-            path.relative("src", file.slice(0, file.length - path.extname(file).length)),
-            path.join(process.cwd(), file)
-        ]);
+        const findInputFiles = () => {
+            const files = globSync("src/**/*.{js,ts}").map((file) => [
+                path.relative("src", file.slice(0, file.length - path.extname(file).length)),
+                path.join(process.cwd(), file)
+            ]);
+
+            return Object.fromEntries(files);
+        };
 
         const config = {
-            input: Object.fromEntries(files),
+            input: findInputFiles(),
             output: { dir: dist, format: "cjs" },
             external: [
                 ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
@@ -69,26 +74,38 @@ export default async function build(args) {
         }
 
         /* if building for development, watch for changes */
-        config.watch = { exclude: "node_modules/**" };
-        const watcher = rollup.watch(config);
+        const startWatchMode = () => {
+            config.input = findInputFiles();
+            config.watch = { exclude: "node_modules/**" };
+            const watcher = rollup.watch(config);
 
-        watcher.on("event", (event) => {
-            switch (event.code) {
-                case "BUNDLE_END":
-                    console.log(`${green("[firefly]")} - build completed.`);
-                    event.result.close();
-                    break;
+            watcher.on("event", (event) => {
+                switch (event.code) {
+                    case "BUNDLE_END":
+                        console.log(`${green("[firefly]")} - build completed.`);
+                        event.result.close();
+                        break;
 
-                case "ERROR":
-                    console.log(`${chalk.red("[firefly]")} - ${event.error.message}`);
-                    if (event.error.frame) console.log(event.error.frame);
-                    break;
+                    case "ERROR":
+                        console.log(`${chalk.red("[firefly]")} - ${event.error.message}`);
+                        if (event.error.frame) console.log(event.error.frame);
+                        break;
 
-                case "FATAL":
-                    console.log(`${chalk.red("[firefly]")} - Fatal Error Occurred.`);
-                    process.exit(1);
-            }
-        });
+                    case "FATAL":
+                        console.log(`${chalk.red("[firefly]")} - fatal error occurred.`);
+                        process.exit(1);
+                }
+            });
+
+            /* detect when a file is added or removed and restart the process */
+            const fsWatcher = chokidar.watch("src/**", { ignoreInitial: true });
+            const restart = () => watcher.close().then(() => fsWatcher.close()).then(startWatchMode);
+
+            fsWatcher.on("add", restart);
+            fsWatcher.on("unlink", restart);
+        };
+
+        startWatchMode();
 
     } catch (error) {
         console.error(`${chalk.red("[firefly]")} - ${error.message}`);
