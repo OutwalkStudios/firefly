@@ -2,15 +2,12 @@
 
 import yargs from "yargs-parser";
 import prompts from "prompts";
-import chalk from "chalk";
 import path from "path";
 import fs from "fs";
 
+import { logger, firefly } from "./utils/logging";
 import { TemplateBuilder } from "./utils/template";
 import { installDependencies, intitializeGitRepository } from "./utils/dependencies";
-
-/* set the firefly hex code */
-const firefly = chalk.hex("#ADFF2F");
 
 /* parse the cli arguments and preset any prompt values */
 const args = yargs(process.argv.slice(2));
@@ -100,12 +97,13 @@ const questions = [
         if (force && !settings.useCurrentDirectory) {
             TemplateBuilder.deleteDirectory(config.name);
         } else {
-            console.error(`${chalk.red("[firefly]")} - ${config.name} already exists.`);
+            logger.error(`${config.name} already exists.`);
             return;
         }
     }
 
-    console.log(`\n${firefly("[firefly]")} - creating ${config.name}...`);
+    console.log("\n");
+    logger.log(`creating ${config.name}...`);
 
     /* find the template paths */
     const templatePath = path.join(__dirname, "../templates/", config.language);
@@ -143,7 +141,7 @@ const questions = [
 
         template.build();
     } catch (error) {
-        console.error(`${chalk.red("[firefly]")} - ${error.message}`);
+        logger.error(error.message);
         return;
     }
 
@@ -152,7 +150,7 @@ const questions = [
         if (!skipInstall) await installDependencies(dependencies, projectPath);
         if (!skipGit) await intitializeGitRepository(projectPath);
     } catch (error) {
-        console.error(`${chalk.red("[firefly]")} - ${error.message}`);
+        logger.error(error.message);
         if (!settings.useCurrentDirectory) TemplateBuilder.deleteDirectory(config.name);
         return;
     }
