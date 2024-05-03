@@ -4,14 +4,14 @@ declare module "@outwalk/firefly" {
 
     export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
-    export abstract class Platform { 
+    export abstract class Platform {
 
         protected abstract loadController(route: string, middleware: Function[], routes: Route[]): void;
         protected abstract loadErrorHandler(): void;
         protected abstract listen(port: number): void;
     }
 
-    export abstract class Database { 
+    export abstract class Database {
 
         protected abstract connect(): Promise<void>;
     }
@@ -105,8 +105,9 @@ declare module "@outwalk/firefly/mongoose" {
     import type { SchemaOptions, Schema, ConnectOptions } from "mongoose";
     import type { Decorator, Database } from "@outwalk/firefly";
 
-    export function Entity(options?: { plugins?: any[]; } & SchemaOptions): Decorator;
+    export function Entity(options?: SchemaOptions): Decorator;
     export function Index(...index: any[]): Decorator;
+    export function Plugin(plugin: any): Decorator;
     export function Prop(type: Object | Schema): Decorator;
 
     export class MongooseDriver extends Database {

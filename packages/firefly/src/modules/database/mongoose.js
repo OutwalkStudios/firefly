@@ -25,8 +25,6 @@ export class MongooseDriver extends Database {
 
 /* a decorator to create a schema and return a model in mongoose */
 export function Entity(options = {}) {
-    const plugins = options.plugins ?? [];
-
     return (target) => {
         /* remove the prototype chain, this enables extending Model */
         const entity = new Object();
@@ -42,7 +40,7 @@ export function Entity(options = {}) {
         (target._indexes ?? []).forEach((index) => schema.index(...index));
 
         /* apply plugins to the schema before compiling the model */
-        plugins.forEach(plugin => schema.plugin(plugin));
+        (target._plugins ?? []).forEach((plugin) => schema.plugin(plugin));
 
         return new mongoose.model(target.name, schema.loadClass(target));
     };
@@ -53,6 +51,14 @@ export function Index(...index) {
     return (target) => {
         target._indexes = target._indexes ?? [];
         target._indexes.push(index);
+    };
+}
+
+/* a decorator to apply a plugin to the schema */
+export function Plugin(plugin) {
+    return (target) => {
+        target._plugins = target._plugins ?? [];
+        target._plugins.push(plugin);
     };
 }
 
