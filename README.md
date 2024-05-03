@@ -30,7 +30,7 @@ npm create @outwalk/firefly
 ### Run the Application
 
 Firefly provides commands to build and run your application for development and production.
-You can start with the dev command which will build the project, watch for changes, and reload the node process whenever you make a change.
+You can start with the dev command which will build the project, watch for changes, and reload the node process whenever you make a change. Its worth noting that when utilizing a database, you will need to configure the database connection before running the application.
 
 ```
 # navigate to the project folder
