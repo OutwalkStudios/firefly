@@ -214,6 +214,7 @@ new Application({ platform }).listen();
 ## Mongoose Database
 
 Firefly is database agnostic. Out of the box, Firefly provides a database driver for MongoDB with Mongoose.
+When utilizing a database, you must configure the database connection before running the application. The MongooseDriver object provides automatic detection of the `DATABASE_URL` environment variable, this is the suggested method of connecting but you can also pass a url option to the MongooseDriver constructor.
 
 **Example:**
 ```js
@@ -248,14 +249,15 @@ export class Task extends Model {
 }
 ```
 
-Mongoose plugins are supported via the `plugins` array option provided by the entity decorator. These plugins will only apply to the current entity. Its worth noting that these plugins are required to be static imports because the Entity decorator is unable to resolve dynamic imports before the model is compiled.
+Mongoose plugins are supported via `@Plugin()` decoraotr. These plugins will only apply to the current entity. Its worth noting that these plugins are required to be static imports because the Entity decorator is unable to resolve dynamic imports before the model is compiled.
 
 **Example:**
 ```js
-import { Entity } from "@outwalk/firefly/mongoose";
+import { Entity, Plugin } from "@outwalk/firefly/mongoose";
 import mongooseAutoPopulate from "mongoose-autopopulate";
 
-@Entity({ plugins: [mongooseAutoPopulate] })
+@Entity()
+@Plugin(mongooseAutoPopulate)
 ```
 
 Firefly also provides support for defining an index on the Mongoose schema. This can be done via the `@Index()` decorator.
