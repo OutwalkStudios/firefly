@@ -7,6 +7,9 @@ export class Application {
     constructor(options = {}) {
         this.platform = options.platform;
         this.database = options.database;
+
+        /* make sure we dont log the startup message on each reload when in dev mode */
+        this.logging = !process.env.FIREFLY_DISABLE_LOGGING;
     }
 
     async listen(port = process.env.PORT ?? 8080) {
@@ -17,7 +20,7 @@ export class Application {
 
             /* if a database driver is provided, run the connect method */
             if (this.database) {
-                logger.log("connecting to database...");
+                if (this.logging) logger.log("connecting to database...");
                 await this.database.connect();
             }
 
@@ -34,7 +37,7 @@ export class Application {
 
             /* start the web server */
             this.platform.listen(port);
-            logger.log(`running on http://localhost:${port}`);
+            if (this.logging) logger.log(`running on http://localhost:${port}`);
         } catch (error) {
             logger.error(error.message);
         }

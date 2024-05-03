@@ -21,7 +21,7 @@ export default async function start(args) {
             if (!fs.existsSync(path.dirname(pathname))) {
                 fs.mkdirSync(path.dirname(pathname));
             }
-            
+
             const watcher = fs.watch(path.dirname(pathname), (event, filename) => {
                 if (event == "rename" && filename == path.basename(pathname)) {
                     if (fs.existsSync(pathname)) {
@@ -48,6 +48,7 @@ export default async function start(args) {
             wait(main).then(() => {
                 nodemon(`${flags.join(" ")} ${main}`);
 
+                nodemon.once("restart", () => process.env.FIREFLY_DISABLE_LOGGING = true);
                 nodemon.on("crash", () => logger.error("failed to reload the application."));
                 nodemon.on("quit", () => process.exit());
             })
