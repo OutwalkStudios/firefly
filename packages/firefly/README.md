@@ -20,6 +20,7 @@ npm install @outwalk/firefly
 
  Table of Contents
 -----------------
+- [Application](#application)
 - [Building Controllers](#building-controllers)
 - [Building Services](#building-services)
 - [Dependency Injection](#dependency-injection)
@@ -31,11 +32,33 @@ npm install @outwalk/firefly
 
 ---
 
+## Application
+
+Your Firefly application starts with the `Application` interface. This object takes in `platform` and `database` options, loads the application based on the file based routing and decorators, and sends the data to the chosen platform to be converted into functioning http routes. The the application's `listen()` method accepts a port and defaults to 8080. This method is what starts the Firefly application.
+
+When you start a new Firefly project, your index.js should look something like this:
+
+```js
+import { Application } from "@outwalk/firefly";
+import { ExpressPlatform } from "@outwalk/firefly/express";
+import { MongooseDriver } from "@outwalk/firefly/mongoose";
+
+/* setup the platform and global middleware */
+const platform = new ExpressPlatform();
+
+/* setup the database and global plugins */
+const database = new MongooseDriver();
+
+/* start the application */
+new Application({ platform, database }).listen();
+```
+---
+
 ## Building Controllers
 
-Controllers are classes marked with the `@Controller()` decorator that are used to define your routes and handle incoming http requests. Controllers use file based routing by default, this means the route url will be the path relative to the `src` directory. For example creating `src/tasks/tasks.controller.js` will result in a route being created at `/tasks`. You can opt-out of file based routing by passing the route to the controller decorator.
+Controllers are classes marked with the `@Controller()` decorator that are used to define your routes and handle incoming http requests. Controllers use file based routing by default, this means the route url will be the path relative to the `src` directory. For example creating a controller inside `src/tasks` will result in a route being created at `/tasks`. You can opt-out of file based routing by passing the route directly to the controller decorator.
 
-Each route can be defined using an http method decorator, Firefly provides a decorator for all http methods. If you want to do something more advanced, there is also the `@Http()` decorator that accepts a method and route argument. All standard http decorators accepts a route argument that defaults to `/`.
+Each route can be defined using an http method decorator, Firefly provides a decorator for all http methods such as `@Get()` and `@Post()`. If you want to do something more advanced, there is also the `@Http()` decorator that accepts a method and route argument. All standard http decorators accepts a route argument that defaults to `/`.
 
 Route methods recieve the platforms request and response objects as arguments. Additionally You can return responses
 directly from the route method. The returned value will be serialized and sent as the response.
