@@ -45,8 +45,9 @@ export class ExpressPlatform extends Platform {
         this.app.use((error, req, res, next) => {
             const statusCode = error.statusCode ?? 500;
             const message = error.message ?? "Something went wrong.";
+            const metadata = error.metadata ?? {};
 
-            return res.status(statusCode).json({ message });
+            return res.status(statusCode).json({ statusCode, message, ...metadata });
         });
     };
 }
