@@ -24,8 +24,8 @@ export class ExpressPlatform extends Platform {
 
             router[route.method](route.route, ...route.middleware, async (req, res, next) => {
                 try {
-                    const result = await route.handler(req, res);
-                    if (result == undefined) return;
+                    const result = await route.handler(req, res, next);
+                    if (result == undefined || result == null) return res.end();
 
                     const status = (route.method == "post") ? 201 : 200;
                     const method = (typeof result === "object") ? "json" : "send";
