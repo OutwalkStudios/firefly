@@ -23,6 +23,7 @@ npm install @outwalk/firefly
 - [Application](#application)
 - [Building Controllers](#building-controllers)
 - [Building Services](#building-services)
+- [Constructors](#constructors)
 - [Dependency Injection](#dependency-injection)
 - [Error Handling](#error-handling)
 - [Platform (Express)](#express-platform)
@@ -139,10 +140,30 @@ export class TaskService {
     }
 
     async getTaskById(id) {
-        return this.tasks.find((task) => task == req.params.id);
+        return this.tasks.find((task) => task == id);
     }
 }
 ```
+
+---
+
+## Constructors
+
+Firefly heavily relies on classes for its API, in general you can use the normal class constructor but this does not support async functionlity. As an alternative for both controllers and services, you can import the `@Init()` decorator and decorate a class method with it. This method will be called during construction time of the controller or service.
+
+```js
+import { Controller, Init } from "@outwalk/firefly";
+
+@Controller()
+export class TaskController {
+
+    @Init()
+    async init() {
+        console.log("async constructor is running");
+    }
+}
+```
+
 
 ---
 
