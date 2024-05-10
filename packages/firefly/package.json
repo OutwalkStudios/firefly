@@ -1,6 +1,6 @@
 {
   "name": "@outwalk/firefly",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Firefly - a modern scalable web framework.",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
