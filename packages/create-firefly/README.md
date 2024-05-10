@@ -13,7 +13,7 @@ A scaffolding tool for creating Firefly projects.
 Create a Firefly project by running the following command and then follow the prompts.
 
 ```
-npm create @outwalk/firefly
+npm create @outwalk/firefly@latest
 ```
 
 You can also specify settings via command line options.
