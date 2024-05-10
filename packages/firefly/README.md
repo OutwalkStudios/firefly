@@ -57,7 +57,7 @@ new Application({ platform, database }).listen();
 
 ## Building Controllers
 
-Controllers are classes marked with the `@Controller()` decorator that are used to define your routes and handle incoming http requests. Controllers use file based routing by default, this means the route url will be the path relative to the `src` directory. For example creating a controller inside `src/tasks` will result in a route being created at `/tasks`. You can opt-out of file based routing by passing the route directly to the controller decorator.
+Controllers are classes marked with the `@Controller()` decorator that are used to define your routes and handle incoming http requests. Controllers use file based routing. This means the route url will be the path relative to the `src` directory. For example creating a controller inside `src/tasks` will result in a route being created at `/tasks`. The actual name of the controller file does not matter as long as it ends with `.controller.js`.
 
 Each route can be defined using an http method decorator, Firefly provides a decorator for all http methods such as `@Get()` and `@Post()`. If you want to do something more advanced, there is also the `@Http()` decorator that accepts a method and route argument. All standard http decorators accepts a route argument that defaults to `/`.
 
