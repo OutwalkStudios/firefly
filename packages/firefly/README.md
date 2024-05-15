@@ -294,6 +294,30 @@ export class Task extends Model {
 }
 ```
 
+In cases where you have a complex prop with nested properties, you may want to use a Subdocument. Firefly supports this via the `@Nested()` decorator, this allows you to create a class that supports all the same features as a normal entity, but rather than exist in its own collection, it will be embedded into an entity, this works similar to a entity reference but does not require populating it. A Nested entity does not require or have a need to extend `Model`.
+
+**Example:**
+```js
+import { Entity, Nested, Prop } from "@outwalk/firefly/mongoose";
+
+@Nested()
+export class Price {
+
+    @Prop(String) currency;
+
+    @Prop(Number) amount;
+}
+
+@Entity()
+export class Product {
+
+    @Prop(String) name;
+
+    @Prop(Price) price;
+}
+
+```
+
 Mongoose plugins are supported via `@Plugin()` decoraotr. These plugins will only apply to the current entity. Its worth noting that these plugins are required to be static imports because the Entity decorator is unable to resolve dynamic imports before the model is compiled.
 
 **Example:**
