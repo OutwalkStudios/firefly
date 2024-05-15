@@ -1,8 +1,8 @@
 import { Database } from "./database";
 import mongoose from "mongoose";
 
-/* A driver to connect to a mongodb database using mongoose */
-export class MongooseDriver extends Database {
+/* An object to connect to a mongodb database using mongoose */
+export class MongooseDatabase extends Database {
 
     constructor(options = {}) {
         super();
@@ -16,10 +16,14 @@ export class MongooseDriver extends Database {
     }
 
     async connect() {
-        if (!this.url) throw new Error("You must provide a url to MongooseDriver.");
+        if (!this.url) throw new Error("You must provide a url to MongooseDatabase.");
 
         await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
         mongoose.connection.on("error", (error) => { throw error; });
+    }
+
+    static get connection() {
+        return mongoose.connection;
     }
 }
 

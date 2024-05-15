@@ -18,7 +18,7 @@ export class Application {
             const { main } = loadPackage();
             const root = main.split("/")[0];
 
-            /* if a database driver is provided, run the connect method */
+            /* if a database object is provided, run the connect method */
             if (this.database) {
                 if (this.logging) logger.log("connecting to database...");
                 await this.database.connect();

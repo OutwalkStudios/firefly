@@ -42,13 +42,13 @@ When you start a new Firefly project, your index.js should look something like t
 ```js
 import { Application } from "@outwalk/firefly";
 import { ExpressPlatform } from "@outwalk/firefly/express";
-import { MongooseDriver } from "@outwalk/firefly/mongoose";
+import { MongooseDatabase } from "@outwalk/firefly/mongoose";
 
 /* setup the platform and global middleware */
 const platform = new ExpressPlatform();
 
 /* setup the database and global plugins */
-const database = new MongooseDriver();
+const database = new MongooseDatabase();
 
 /* start the application */
 new Application({ platform, database }).listen();
@@ -258,20 +258,20 @@ new Application({ platform }).listen();
 
 ## Mongoose Database
 
-Firefly is database agnostic. Out of the box, Firefly provides a database driver for MongoDB with Mongoose.
-When utilizing a database, you must configure the database connection before running the application. The MongooseDriver object provides automatic detection of the `DATABASE_URL` environment variable, this is the suggested method of connecting but you can also pass a url option to the MongooseDriver constructor.
+Firefly is database agnostic. Out of the box, Firefly provides a database object for MongoDB with Mongoose.
+When utilizing a database, you must configure the database connection before running the application. The MongooseDatabase object provides automatic detection of the `DATABASE_URL` environment variable, this is the suggested method of connecting but you can also pass a url option to the MongooseDatabase constructor.
 
 **Example:**
 ```js
 import { Application } from "@outwalk/firefly";
 import { ExpressPlatform } from "@outwalk/firefly/express";
-import { MongooseDriver } from "@outwalk/firefly/mongoose";
+import { MongooseDatabase } from "@outwalk/firefly/mongoose";
 
 /* setup the platform and global middleware */
 const platform = new ExpressPlatform();
 
 /* setup the database and global plugins */
-const database = new MongooseDriver();
+const database = new MongooseDatabase();
 database.plugin(import("mongoose-autopopulate"));
 
 /* start the application */

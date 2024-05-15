@@ -1,1 +1,1 @@
-import { MongooseDriver } from "@outwalk/firefly/mongoose";
+import { MongooseDatabase } from "@outwalk/firefly/mongoose";

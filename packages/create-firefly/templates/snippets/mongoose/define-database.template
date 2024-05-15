@@ -1,2 +1,2 @@
 /* setup the database and global plugins */
-const database = new MongooseDriver();
+const database = new MongooseDatabase();
