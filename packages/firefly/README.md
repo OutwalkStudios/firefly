@@ -315,7 +315,6 @@ export class Product {
 
     @Prop(Price) price;
 }
-
 ```
 
 Mongoose plugins are supported via `@Plugin()` decoraotr. These plugins will only apply to the current entity. Its worth noting that these plugins are required to be static imports because the Entity decorator is unable to resolve dynamic imports before the model is compiled.
