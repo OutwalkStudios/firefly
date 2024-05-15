@@ -27,8 +27,8 @@ export class MongooseDatabase extends Database {
     }
 }
 
-/* a decorator to create a schema and return a model in mongoose */
-export function Entity(options = {}) {
+/* create a mongoose entity with a type of either entity or nested */
+function createMongooseEntity(type, options = {}) {
     return (target) => {
         /* remove the prototype chain, this enables extending Model */
         const entity = new Object();
@@ -46,9 +46,13 @@ export function Entity(options = {}) {
         /* apply plugins to the schema before compiling the model */
         (target._plugins ?? []).forEach((plugin) => schema.plugin(plugin));
 
-        return new mongoose.model(target.name, schema.loadClass(target));
+        return (type == "nested") ? schema.loadClass(target) : new mongoose.model(target.name, schema.loadClass(target));
     };
 }
+
+/* create decorators for defining mongoose entity types */
+export const Entity = createMongooseEntity.bind(null, "entity");
+export const Nested = createMongooseEntity.bind(null, "nested");
 
 /* a decorator to define an index on the database */
 export function Index(...index) {
@@ -69,14 +73,18 @@ export function Plugin(plugin) {
 /* a decorator to define schema properties on an entity */
 export function Prop(type) {
     const isObject = (obj) => obj != undefined && Object.getPrototypeOf(obj) === Object.prototype;
-    const isModel = (obj) => obj?.name == "model";
+    const isEntity = (obj) => obj?.name == "model";
+    const isNested = (obj) => obj?.name == "Schema";
 
     /* process the type to resolve references to other models */
     const processType = (type) => {
-        /* the type is a model */
-        if (isModel(type)) {
+        /* the type is an entity */
+        if (isEntity(type)) {
             return { type: mongoose.Types.ObjectId, ref: type.modelName };
         }
+
+        /* the type is a nested entity */
+        if (isNested(type)) return type;
 
         /* the type is an array */
         if (Array.isArray(type)) {
@@ -88,10 +96,13 @@ export function Prop(type) {
                 return type;
             }
 
-            /* subtype is a model */
-            if (isModel(type[0])) {
+            /* subtype is an entity */
+            if (isEntity(type[0])) {
                 return [{ type: mongoose.Types.ObjectId, ref: type[0].modelName }];
             }
+
+            /* subtype is a nested entity */
+            if (isNested(type[0])) return type[0];
         }
 
         /* the type is an object */
@@ -104,10 +115,17 @@ export function Prop(type) {
                 return type;
             }
 
-            /* subtype is a model */
-            if (isModel(type?.type)) {
+            /* subtype is an entity */
+            if (isEntity(type?.type)) {
                 type.ref = type.type.modelName;
                 type.type = mongoose.Types.ObjectId;
+
+                return type;
+            }
+
+            /* the type is a nested entity */
+            if (isNested(type?.type)) {
+                type.type = type;
 
                 return type;
             }
