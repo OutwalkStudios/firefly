@@ -299,6 +299,7 @@ In cases where you have a complex prop with nested properties, you may want to u
 **Example:**
 ```js
 import { Entity, Nested, Prop } from "@outwalk/firefly/mongoose";
+import { Model } from "mongoose";
 
 @Nested()
 export class Price {
@@ -309,7 +310,7 @@ export class Price {
 }
 
 @Entity()
-export class Product {
+export class Product extends Model {
 
     @Prop(String) name;
 
