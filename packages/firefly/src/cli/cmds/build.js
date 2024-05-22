@@ -37,7 +37,7 @@ export default async function build(args) {
 
         /* determine the input files */
         const findInputFiles = () => {
-            const files = globSync("src/**/*.{js,ts}").map((file) => [
+            const files = globSync("src/**/*.{js,ts}", { ignore: "src/**/*.d.ts" }).map((file) => [
                 path.relative("src", file.slice(0, file.length - path.extname(file).length)),
                 path.join(process.cwd(), file)
             ]);
