@@ -27,15 +27,15 @@ export class MongooseDatabase extends Database {
     }
 }
 
-/* create a mongoose entity with a type of either entity or nested */
-function createMongooseEntity(type, options = {}) {
+/* create a mongoose entity */
+export function Entity(options) {
     return (target) => {
-        /* remove the prototype chain, this enables extending Model */
-        const entity = new Object();
-        entity.constructor._props = target._props;
+        /* remove the prototype chain, this enables extending Model or Schema */
+        const type = Object.getPrototypeOf(target.prototype).constructor.name;
+        Object.setPrototypeOf(target, Object.prototype);
 
         /* update the schema with default property values */
-        const props = Object.entries(entity).filter(([key, value]) => target._props[key] && value != undefined);
+        const props = Object.entries(target).filter(([key, value]) => target._props[key] && value != undefined);
         props.forEach(([key, value]) => target._props[key] = { type: target._props[key], default: value });
 
         const schema = new mongoose.Schema(target._props, options);
@@ -46,13 +46,13 @@ function createMongooseEntity(type, options = {}) {
         /* apply plugins to the schema before compiling the model */
         (target._plugins ?? []).forEach((plugin) => schema.plugin(plugin));
 
-        return (type == "nested") ? schema.loadClass(target) : new mongoose.model(target.name, schema.loadClass(target));
+        if (!["Schema", "Model"].includes(type)) {
+            throw new Error(`${target.name} must extend either Schema or Model.`);
+        }
+
+        return (type == "Schema") ? schema.loadClass(target) : new mongoose.model(target.name, schema.loadClass(target));
     };
 }
-
-/* create decorators for defining mongoose entity types */
-export const Entity = createMongooseEntity.bind(null, "entity");
-export const Nested = createMongooseEntity.bind(null, "nested");
 
 /* a decorator to define an index on the database */
 export function Index(...index) {

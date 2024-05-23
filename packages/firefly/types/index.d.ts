@@ -106,7 +106,6 @@ declare module "@outwalk/firefly/mongoose" {
     import type { Decorator, Database } from "@outwalk/firefly";
 
     export function Entity(options?: SchemaOptions): Decorator;
-    export function Nested(options?: SchemaOptions): Decorator;
     export function Index(...index: any[]): Decorator;
     export function Plugin(plugin: any): Decorator;
     export function Prop(type: Object | Schema): Decorator;
