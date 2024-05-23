@@ -57,7 +57,7 @@ new Application({ platform, database }).listen();
 
 ## Building Controllers
 
-Controllers are classes marked with the `@Controller()` decorator that are used to define your routes and handle incoming http requests. Controllers use file based routing. This means the route url will be the path relative to the `src` directory. For example creating a controller inside `src/tasks` will result in a route being created at `/tasks`. The actual name of the controller file does not matter as long as it ends with `.controller.js`.
+Controllers are classes marked with the `@Controller()` decorator. They are used to define your routes and handle incoming http requests. Controllers use file based routing. This means the route url will be the path relative to the `src` directory. For example creating a controller inside `src/tasks` will result in a route being created at `/tasks`. The actual name of the controller file does not matter as long as it ends with `.controller.js`. Optionally you can change the route of the controller by passing it to the `@Controller()` decorator. Its important to note that this only replaced the immediate route fragment, in the tasks example this would replace the `/tasks` in `src/tasks`.
 
 Each route can be defined using an http method decorator, Firefly provides a decorator for all http methods such as `@Get()` and `@Post()`. If you want to do something more advanced, there is also the `@Http()` decorator that accepts a method and route argument. All standard http decorators accepts a route argument that defaults to `/`.
 
@@ -278,7 +278,7 @@ database.plugin(import("mongoose-autopopulate"));
 new Application({ platform, database }).listen();
 ```
 
-Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. Its worth noting that when using TypeScript you must extend `Model` from mongoose to get the proper types. This is not required in JavaScript but is still recommended.
+Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. In order for the entity decorator to properly understand how to compile your entity, you must extend either `Model` or `Schema` from the mongoose package.
 
 **Example:**
 ```js
@@ -294,15 +294,15 @@ export class Task extends Model {
 }
 ```
 
-In cases where you have a complex prop with nested properties, you may want to use a Subdocument. Firefly supports this via the `@Nested()` decorator, this allows you to create a class that supports all the same features as a normal entity, but rather than exist in its own collection, it will be embedded into an entity, this works similar to a entity reference but does not require populating it. A Nested entity does not require or have a need to extend `Model`.
+In cases where you have a complex prop with nested properties, you may want to use a Subdocument. Firefly supports this via the `@Entity()` decorator, this allows you to create a class that supports all the same features as a normal entity, but rather than extend `Model` and be in its own collection, you can extend `Schema` and nest it inside another entity. this works similar to a entity reference but does not require populating it.
 
 **Example:**
 ```js
-import { Entity, Nested, Prop } from "@outwalk/firefly/mongoose";
-import { Model } from "mongoose";
+import { Entity, Prop } from "@outwalk/firefly/mongoose";
+import { Schema, Model } from "mongoose";
 
-@Nested()
-export class Price {
+@Entity()
+export class Price extends Schema {
 
     @Prop(String) currency;
 
