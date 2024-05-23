@@ -28,7 +28,7 @@ declare module "@outwalk/firefly" {
 
     export function Init(): Decorator;
 
-    export function Controller(): Decorator;
+    export function Controller(route?: string): Decorator;
     export function Http(method: string, route?: string): Decorator;
     export function Head(route?: string): Decorator;
     export function Get(route?: string): Decorator;

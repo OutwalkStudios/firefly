@@ -7,8 +7,11 @@ function createHttpDecorator(method, route = "/") {
 }
 
 /* a decorator to apply the controller metadata to a class */
-export function Controller() {
-    return (target) => { target._controller = true; };
+export function Controller(route) {
+    return (target) => {
+        target._controller = true;
+        target._route = route;
+    };
 }
 
 /* a decorator to apply middleware to a controller or route */

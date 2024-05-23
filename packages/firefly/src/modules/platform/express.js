@@ -17,7 +17,7 @@ export class ExpressPlatform extends Platform {
     listen(port) { this.app.listen(port); }
 
     loadController(route, middleware, routes) {
-        const router = express.Router();
+        const router = express.Router({ mergeParams: true });
         if (middleware.length > 0) router.use(...middleware);
 
         for (let route of routes) {

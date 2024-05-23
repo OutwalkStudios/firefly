@@ -63,7 +63,7 @@ export async function loadInjectables(directory, injectables = {}, root = true) 
 /* load and return the controllers */
 export async function loadControllers(root, directory, injectables, controllers = {}) {
     const routes = fs.readdirSync(directory);
-    
+
     for (let route of routes) {
         const stat = fs.statSync(path.join(directory, route));
 
@@ -95,7 +95,8 @@ export async function loadControllers(root, directory, injectables, controllers 
                 }
 
                 const fileRoute = directory.split(root).at(-1);
-                const endpoint = fileRoute.length > 0 ? fileRoute : "/";
+                const fileEndpoint = fileRoute.length > 0 ? fileRoute : "/";
+                const endpoint = (exports[name]._route) ? fileEndpoint.replace(/\/[^/]+\/?$/, exports[name]._route) : fileEndpoint;
 
                 if (controllers[endpoint]) {
                     throw new Error(`Controller "${name}" uses the route "${endpoint}" which already exists.`);
