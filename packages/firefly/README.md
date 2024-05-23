@@ -339,6 +339,30 @@ import { Entity, Index } from "@outwalk/firefly/mongoose";
 @Index({ name: "text" }, { weights: { name: 10 } })
 ```
 
+In more complex cases you may want to extend from another entity. For example, this enables the ability to have an array typed with a super class that all sub classes can be stored in.
+In mongoose you can do this using the `Model.discriminator` function. This can still be done with the entity decorator, however you can also just extend the parent model like any other class.
+
+**Example:**
+```js
+import { Entity, Prop } from "@outwalk/firefly/mongoose";
+import { Model } from "mongoose";
+
+@Entity()
+export class Animal extends Model { ... }
+
+@Entity()
+export class Dog extends Animal { ... }
+
+@Entity()
+export class Person extends Model {
+
+    @Prop([Animal]) pets;
+}
+
+const person = await Person.findOne(...).exec();
+person.pets.push(new Dog());
+```
+
 ---
 
 ## Custom Integrations
