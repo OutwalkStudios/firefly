@@ -27,11 +27,25 @@ export class MongooseDatabase extends Database {
     }
 }
 
+/* get the prototype chain as an array of strings */
+function getPrototypeChain(target) {
+    let parent = Object.getPrototypeOf(target.prototype).constructor;
+    const parents = [];
+
+    while (parent.name != "Object") {
+        parents.push((parent.name == "model") ? parent.modelName : parent.name);
+        parent = Object.getPrototypeOf(parent.prototype).constructor;
+    }
+
+    return parents;
+}
+
 /* create a mongoose entity */
 export function Entity(options) {
     return (target) => {
-        /* remove the prototype chain, this enables extending Model or Schema */
-        const type = Object.getPrototypeOf(target.prototype).constructor.name;
+
+        /* collect the prototype chain and reset the target prototype */
+        const prototype = getPrototypeChain(target);
         Object.setPrototypeOf(target, Object.prototype);
 
         /* update the schema with default property values */
@@ -46,11 +60,16 @@ export function Entity(options) {
         /* apply plugins to the schema before compiling the model */
         (target._plugins ?? []).forEach((plugin) => schema.plugin(plugin));
 
-        if (!["Schema", "Model"].includes(type)) {
-            throw new Error(`${target.name} must extend either Schema or Model.`);
+        if (!prototype.includes("Schema") && !prototype.includes("Model")) {
+            throw new Error(`${target.name} or a parent must extend either Schema or Model.`);
         }
 
-        return (type == "Schema") ? schema.loadClass(target) : new mongoose.model(target.name, schema.loadClass(target));
+        /* if the immediate parent class is a model, compile it as a discriminator */
+        if (mongoose.models[prototype[0]]) {
+            return mongoose.models[prototype[0]].discriminator(target.name, schema.loadClass(target));
+        }
+
+        return (prototype.includes("Schema")) ? schema.loadClass(target) : new mongoose.model(target.name, schema.loadClass(target));
     };
 }
 
