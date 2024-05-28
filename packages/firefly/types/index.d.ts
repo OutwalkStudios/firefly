@@ -13,7 +13,10 @@ declare module "@outwalk/firefly" {
 
     export abstract class Database {
 
-        protected abstract connect(): Promise<void>;
+        initialize(): void;
+
+        abstract connect(): Promise<Database>;
+        abstract isConnected(): boolean;
     }
 
     export class Application {
@@ -114,9 +117,9 @@ declare module "@outwalk/firefly/mongoose" {
 
         constructor(options?: { url?: string; } & ConnectOptions);
 
-        protected connect(): Promise<void>;
-
         plugin(plugin: any): void;
+        connect(): Promise<Database>;
+        isConnected(): boolean;
 
         static get connection(): Connection;
     }

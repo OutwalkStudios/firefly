@@ -16,10 +16,18 @@ export class MongooseDatabase extends Database {
     }
 
     async connect() {
+        super.initialize();
+
         if (!this.url) throw new Error("You must provide a url to MongooseDatabase.");
 
         await mongoose.connect(this.url, this.options).catch((error) => { throw error; });
         mongoose.connection.on("error", (error) => { throw error; });
+
+        return this;
+    }
+
+    isConnected() {
+        return mongoose.connections.length > 0;
     }
 
     static get connection() {

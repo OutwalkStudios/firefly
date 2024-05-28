@@ -18,10 +18,16 @@ export class Application {
             const { main } = loadPackage();
             const root = main.split("/")[0];
 
-            /* if a database object is provided, run the connect method */
+            /* if a database object is provided, run connect and check for initialization */
             if (this.database) {
-                if (this.logging) logger.log("connecting to database...");
-                await this.database.connect();
+                if (!this.database.isConnected()) {
+                    await this.database.connect();
+                }
+
+                /* ensure database initialization is called */
+                if (!this.database.isInitialized) {
+                    throw new Error("Database.connect() must call Database.initialize() internally.");
+                }
             }
 
             /* load the injectables and controllers from the filesystem */
