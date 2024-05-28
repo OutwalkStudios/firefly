@@ -15,7 +15,10 @@ export default {
         "src/modules/platform/express.js",
         "src/modules/database/mongoose.js",
     ],
-    output: { dir: "dist", format: "cjs" },
+    output: [
+        { dir: "dist/cjs", format: "cjs", entryFileNames: "[name].cjs", chunkFileNames: "[name].cjs" },
+        { dir: "dist/esm", format: "esm", entryFileNames: "[name].js", chunkFileNames: "[name].js" }
+    ],
     external: [
         ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
         ...Object.keys(peerDependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
