@@ -65,6 +65,11 @@ const questions = [
     const settings = { useCurrentDirectory: false };
     const dependencies = ["@outwalk/firefly"];
 
+    /* add the language dependency if its an npm package */
+    if (config.language != "javascript") {
+        dependencies.push(config.language);
+    }
+
     /* add the platform to dependencies if its an npm package */
     if (!["none", "custom-platform"].includes(config.platform)) {
         dependencies.push(config.platform);
