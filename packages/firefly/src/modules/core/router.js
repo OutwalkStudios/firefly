@@ -1,3 +1,4 @@
+import { Module } from "../../utils/files";
 import path from "path";
 import fs from "fs";
 
@@ -24,7 +25,7 @@ export async function loadInjectables(directory, injectables = {}, root = true) 
         }
 
         else if (stat.isFile() && route.endsWith(".service.js")) {
-            const exports = await import(path.join(path.relative(__dirname, directory), route));
+            const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
 
             for (let name of Object.keys(exports)) {
                 if (!exports[name]?._injectable) continue;
@@ -72,7 +73,7 @@ export async function loadControllers(root, directory, injectables, controllers 
         }
 
         else if (stat.isFile() && route.endsWith(".controller.js")) {
-            const exports = await import(path.join(path.relative(__dirname, directory), route));
+            const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
 
             for (let name of Object.keys(exports)) {
                 if (!exports[name]?._controller) continue;

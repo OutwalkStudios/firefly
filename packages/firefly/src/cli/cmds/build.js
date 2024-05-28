@@ -25,8 +25,9 @@ export default async function build(args) {
         logger.log("building the project...");
 
         /* get the projects package.json and determine language */
-        const { main, engines, dependencies } = loadPackage();
+        const { main, type, engines, dependencies } = loadPackage();
         const isTypeScript = fs.existsSync(path.join(process.cwd(), "tsconfig.json"));
+        const isModule = (type != undefined) ? (type == "module") ? true : false : false;
         const dist = main.split("/")[0];
 
         /* determine the node version being targeted */
@@ -47,7 +48,7 @@ export default async function build(args) {
 
         const config = {
             input: findInputFiles(),
-            output: { dir: dist, format: "cjs" },
+            output: { dir: dist, format: isModule ? "esm" : "cjs" },
             external: [
                 ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
                 ...module.builtinModules
