@@ -1,7 +1,13 @@
 /* implement a database using the firefly database interface */
 class CustomDatabase extends Database {
     
-    async connect() {}
+    async connect() {
+        super.displayConnectionMessage();
+    }
+
+    isConnected() {
+        return false;
+    }
 }
 
 const database = new CustomDatabase();
