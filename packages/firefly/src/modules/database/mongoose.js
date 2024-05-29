@@ -16,7 +16,7 @@ export class MongooseDatabase extends Database {
     }
 
     async connect() {
-        super.initialize();
+        super.displayConnectionMessage();
 
         if (!this.url) throw new Error("You must provide a url to MongooseDatabase.");
 
@@ -27,7 +27,7 @@ export class MongooseDatabase extends Database {
     }
 
     isConnected() {
-        return mongoose.connections.length > 0;
+        return mongoose.connection.readyState == 1;
     }
 
     static get connection() {
