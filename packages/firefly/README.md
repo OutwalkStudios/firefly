@@ -367,7 +367,7 @@ person.pets.push(new Dog());
 
 ## Custom Integrations
 
-Firefly provides `Platform` and `Database` classes to create your own integrations for use with the Firefly framework. Instances of these objects can be passed into the Application interface.
+Firefly provides `Platform` and `Database` classes to create your own integrations for use with the Firefly framework. Instances of these objects can be passed into the Application interface. The Database interface provides a `displayConnectionMessage()` method to only display the connection message on the first load.
 
 **Platform Example:**
 ```js
@@ -389,7 +389,13 @@ import { Database } from "@outwalk/firefly";
 
 class CustomDatabase extends Database {
     
-    async connect() {}
+    async connect() {
+        super.displayConnectionMessage();
+    }
+
+    isConnected() { 
+        return false
+    }
 }
 ```
 
