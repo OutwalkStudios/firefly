@@ -118,7 +118,7 @@ declare module "@outwalk/firefly/mongoose" {
         constructor(options?: { url?: string; } & ConnectOptions);
 
         plugin(plugin: any): void;
-        connect(): Promise<Database>;
+        connect(): Promise<MongooseDatabase>;
         isConnected(): boolean;
 
         static get connection(): Connection;
