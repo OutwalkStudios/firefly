@@ -1,5 +1,5 @@
 import { Database } from "./database";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 /* export the Schema and Model objects from mongoose so we can modify the types */
 export { Schema, Model } from "mongoose";
@@ -59,10 +59,6 @@ export function Entity(options) {
         const prototype = getPrototypeChain(target);
         Object.setPrototypeOf(target, Object.prototype);
 
-        /* update the schema with default property values */
-        const props = Object.entries(target).filter(([key, value]) => target._props[key] && value != undefined);
-        props.forEach(([key, value]) => target._props[key] = { type: target._props[key], default: value });
-
         const schema = new mongoose.Schema(target._props, options);
 
         /* apply indexes to the schema before compiling the model */
@@ -102,37 +98,39 @@ export function Plugin(plugin) {
 
 /* a decorator to define schema properties on an entity */
 export function Prop(type) {
-    const isObject = (obj) => obj != undefined && Object.getPrototypeOf(obj) === Object.prototype;
-    const isEntity = (obj) => obj?.name == "model";
-    const isNested = (obj) => obj?.name == "Schema";
+    const isObject = (obj) => (obj != undefined && Object.getPrototypeOf(obj) === Object.prototype);
+    const isModel = (obj) => (obj?.name == "model");
+    const isSchema = (obj) => (obj instanceof Schema);
 
     /* process the type to resolve references to other models */
     const processType = (type) => {
-        /* the type is an entity */
-        if (isEntity(type)) {
+        /* the type is a mongoose model */
+        if (isModel(type)) {
             return { type: mongoose.Types.ObjectId, ref: type.modelName };
         }
 
-        /* the type is a nested entity */
-        if (isNested(type)) return type;
+        /* the type is a mongoose schema */
+        if (isSchema(type)) {
+            return { type: type, default: () => ({}) };
+        }
 
         /* the type is an array */
         if (Array.isArray(type)) {
 
-            /* the type is a nested model */
+            /* the type is a nested object */
             if (isObject(type[0])) {
                 type[0] = processType(type[0]);
 
                 return type;
             }
 
-            /* subtype is an entity */
-            if (isEntity(type[0])) {
+            /* subtype is a mongoose model */
+            if (isModel(type[0])) {
                 return [{ type: mongoose.Types.ObjectId, ref: type[0].modelName }];
             }
 
-            /* subtype is a nested entity */
-            if (isNested(type[0])) return type[0];
+            /* subtype is a mongoose schema */
+            if (isSchema(type[0])) return [type[0]];
         }
 
         /* the type is an object */
@@ -145,18 +143,19 @@ export function Prop(type) {
                 return type;
             }
 
-            /* subtype is an entity */
-            if (isEntity(type?.type)) {
+            /* subtype is a mongoose model */
+            if (isModel(type?.type)) {
                 type.ref = type.type.modelName;
                 type.type = mongoose.Types.ObjectId;
 
                 return type;
             }
 
-            /* the type is a nested entity */
-            if (isNested(type?.type)) {
-                type.type = type;
-
+            /* the type is a mongoose schema */
+            if (isSchema(type?.type)) {
+                /* use === to avoid type coercion */
+                type.default = (type.default === undefined) ? () => ({}) : type.default;
+                
                 return type;
             }
 
