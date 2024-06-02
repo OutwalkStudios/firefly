@@ -1,6 +1,9 @@
 import { Database } from "./database";
 import mongoose from "mongoose";
 
+/* export the Schema and Model objects from mongoose so we can modify the types */
+export { Schema, Model } from "mongoose";
+
 /* An object to connect to a mongodb database using mongoose */
 export class MongooseDatabase extends Database {
 

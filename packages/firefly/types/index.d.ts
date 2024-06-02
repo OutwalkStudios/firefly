@@ -105,22 +105,25 @@ declare module "@outwalk/firefly/express" {
 }
 
 declare module "@outwalk/firefly/mongoose" {
-    import type { SchemaOptions, Schema, ConnectOptions, Connection } from "mongoose";
     import type { Decorator, Database } from "@outwalk/firefly";
+    import type mongoose from "mongoose";
 
-    export function Entity(options?: SchemaOptions): Decorator;
+    export class Schema extends Partial<mongoose.Schema> {}
+    export class Model extends mongoose.Model {}
+
+    export function Entity(options?: mongoose.SchemaOptions): Decorator;
     export function Index(...index: any[]): Decorator;
     export function Plugin(plugin: any): Decorator;
-    export function Prop(type: Object | Schema): Decorator;
+    export function Prop(type: Object | mongoose.Schema): Decorator;
 
     export class MongooseDatabase extends Database {
 
-        constructor(options?: { url?: string; } & ConnectOptions);
+        constructor(options?: { url?: string; } & mongoose.ConnectOptions);
 
         plugin(plugin: any): void;
         connect(): Promise<MongooseDatabase>;
         isConnected(): boolean;
 
-        static get connection(): Connection;
+        static get connection(): mongoose.Connection;
     }
 }
