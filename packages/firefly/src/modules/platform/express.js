@@ -1,5 +1,6 @@
 import { Platform } from "./platform";
 import express from "express";
+import cookieParser from "cookie-parser";
 
 export class ExpressPlatform extends Platform {
 
@@ -11,6 +12,7 @@ export class ExpressPlatform extends Platform {
         this.app.disable("x-powered-by");
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(express.json());
+        this.app.use(cookieParser());
     }
 
     use(...middleware) { this.app.use(...middleware); }
