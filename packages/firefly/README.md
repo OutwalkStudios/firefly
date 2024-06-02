@@ -278,12 +278,11 @@ database.plugin(import("mongoose-autopopulate"));
 new Application({ platform, database }).listen();
 ```
 
-Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. In order for the entity decorator to properly understand how to compile your entity, you must extend either `Model` or `Schema` from the mongoose package.
+Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. In order for the entity decorator to properly understand how to compile your entity, you must extend either `Model` or `Schema` which are the direct mongoose objects with modified types.
 
 **Example:**
 ```js
-import { Entity, Prop } from "@outwalk/firefly/mongoose";
-import { Model } from "mongoose";
+import { Entity, Model, Prop } from "@outwalk/firefly/mongoose";
 
 @Entity()
 export class Task extends Model {
@@ -298,8 +297,7 @@ In cases where you have a complex prop with nested properties, you may want to u
 
 **Example:**
 ```js
-import { Entity, Prop } from "@outwalk/firefly/mongoose";
-import { Schema, Model } from "mongoose";
+import { Entity, Schema, Model, Prop } from "@outwalk/firefly/mongoose";
 
 @Entity()
 export class Price extends Schema {
@@ -344,8 +342,7 @@ In mongoose you can do this using the `Model.discriminator` function. This can s
 
 **Example:**
 ```js
-import { Entity, Prop } from "@outwalk/firefly/mongoose";
-import { Model } from "mongoose";
+import { Entity, Model, Prop } from "@outwalk/firefly/mongoose";
 
 @Entity()
 export class Animal extends Model { ... }
