@@ -1,5 +1,5 @@
 import { Database } from "./database";
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 /* export the Schema and Model objects from mongoose so we can modify the types */
 export { Schema, Model } from "mongoose";
@@ -100,7 +100,7 @@ export function Plugin(plugin) {
 export function Prop(type) {
     const isObject = (obj) => (obj != undefined && Object.getPrototypeOf(obj) === Object.prototype);
     const isModel = (obj) => (obj?.name == "model");
-    const isSchema = (obj) => (obj instanceof Schema);
+    const isSchema = (obj) => (obj instanceof mongoose.Schema);
 
     /* process the type to resolve references to other models */
     const processType = (type) => {
