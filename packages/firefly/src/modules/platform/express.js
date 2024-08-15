@@ -9,9 +9,15 @@ export class ExpressPlatform extends Platform {
 
         this.app = express();
 
+        /* this function adds a rawBody property to the request object */
+        const rawBodyBuffer = (req, res, buffer, encoding) => {
+            if (!buffer || !buffer.length) return;
+            req.rawBody = buffer.toString(encoding || "utf8");
+        };
+
         this.app.disable("x-powered-by");
-        this.app.use(express.urlencoded({ extended: true }));
-        this.app.use(express.json());
+        this.app.use(express.urlencoded({ verify: rawBodyBuffer, extended: true }));
+        this.app.use(express.json({ verify: rawBodyBuffer }));
         this.app.use(cookieParser());
     }
 

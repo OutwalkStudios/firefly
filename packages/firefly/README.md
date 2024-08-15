@@ -240,6 +240,8 @@ export class TaskService {
 Firefly is platform agnostic. The controller decorators provide metadata to the class which is handled by the application interface,
 out of the box, Firefly provides a platform binding for express, enabling integration with the entire express ecosystem.
 
+Firefly also extends the Express Request object by adding a `rawBody` property to it, which is useful for webhook signature validation. When using typescript you can access the request typing for this by importing `RawBodyRequest` from `@outwalk/firefly/express`.
+
 **Example:**
 ```js
 import { Application } from "@outwalk/firefly";

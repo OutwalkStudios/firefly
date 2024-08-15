@@ -93,6 +93,7 @@ declare module "@outwalk/firefly/errors" {
 
 declare module "@outwalk/firefly/express" {
     import type { Platform, Route } from "@outwalk/firefly";
+    import type { Request } from "express";
 
     export class ExpressPlatform extends Platform {
 
@@ -101,6 +102,10 @@ declare module "@outwalk/firefly/express" {
         protected listen(port: number): void;
 
         use(...middleware: any[]): void;
+    }
+
+    export interface RawBodyRequest extends Request {
+        rawBody?: string;
     }
 }
 
