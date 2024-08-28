@@ -120,6 +120,7 @@ declare module "@outwalk/firefly/mongoose" {
     export function Index(...index: any[]): Decorator;
     export function Plugin(plugin: any): Decorator;
     export function Prop(type: Object | mongoose.Schema): Decorator;
+    export function Virtual(virtual: mongoose.VirtualTypeOptions): Decorator;
 
     export class MongooseDatabase extends Database {
 

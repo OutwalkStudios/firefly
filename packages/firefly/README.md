@@ -280,7 +280,7 @@ database.plugin(import("mongoose-autopopulate"));
 new Application({ platform, database }).listen();
 ```
 
-Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. In order for the entity decorator to properly understand how to compile your entity, you must extend either `Model` or `Schema` which are the direct mongoose objects with modified types.
+Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. In order for the entity decorator to properly understand how to compile your entity, you must extend either `Model` or `Schema` which are the direct mongoose objects with modified types. For defining virtual properties, Firefly provides the `@Virtual()` decorator which can be used in place of the `@Prop()` decorator.
 
 **Example:**
 ```js

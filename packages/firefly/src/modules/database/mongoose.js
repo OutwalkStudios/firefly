@@ -67,16 +67,25 @@ export function Entity(options) {
         /* apply plugins to the schema before compiling the model */
         (target._plugins ?? []).forEach((plugin) => schema.plugin(plugin));
 
+        /* apply virtuals to the schema before compiling the model */
+        if (target._virtuals) {
+            for (let [key, options] of Object.entries(target._virtuals)) {
+                const virtual = schema.virtual(key, options);
+                if (options.get) virtual.get(options.get);
+                if (options.set) virtual.set(options.set);
+            }
+        }
+
         if (!prototype.includes("Schema") && !prototype.includes("Model")) {
             throw new Error(`${target.name} or a parent must extend either Schema or Model.`);
         }
 
         /* if the immediate parent class is a model, compile it as a discriminator */
         if (mongoose.models[prototype[0]]) {
-            return mongoose.models[prototype[0]].discriminator(target.name, schema.loadClass(target));
+            return mongoose.models[prototype[0]].discriminator(target.name, schema);
         }
 
-        return (prototype.includes("Schema")) ? schema.loadClass(target) : new mongoose.model(target.name, schema.loadClass(target));
+        return (prototype.includes("Schema")) ? schema : new mongoose.model(target.name, schema);
     };
 }
 
@@ -93,6 +102,14 @@ export function Plugin(plugin) {
     return (target) => {
         target._plugins = target._plugins ?? [];
         target._plugins.push(plugin);
+    };
+}
+
+/* a decorator to define schema virtual properties on an entity */
+export function Virtual(virtual) {
+    return (target, key) => {
+        target.constructor._virtuals = target.constructor._virtuals ?? {};
+        target.constructor._virtuals[key] = virtual;
     };
 }
 
@@ -155,7 +172,7 @@ export function Prop(type) {
             if (isSchema(type?.type)) {
                 /* use === to avoid type coercion */
                 type.default = (type.default === undefined) ? () => ({}) : type.default;
-                
+
                 return type;
             }
 
