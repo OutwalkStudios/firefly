@@ -4,9 +4,10 @@ import cookieParser from "cookie-parser";
 
 export class ExpressPlatform extends Platform {
 
-    constructor() {
+    constructor(options = { logErrors: true }) {
         super();
 
+        this.options = options;
         this.app = express();
 
         /* this function adds a rawBody property to the request object */
@@ -21,7 +22,8 @@ export class ExpressPlatform extends Platform {
         this.app.use(cookieParser());
     }
 
-    use(...middleware) { this.app.use(...middleware); }
+    use(...args) { this.app.use(...args); }
+    set(...args) { this.app.set(...args); }
     listen(port) { this.app.listen(port); }
 
     loadController(route, middleware, routes) {
@@ -54,6 +56,8 @@ export class ExpressPlatform extends Platform {
             const statusCode = error.statusCode ?? 500;
             const message = error.message ?? "Something went wrong.";
             const metadata = error.metadata ?? {};
+
+            if (this.options.logErrors) console.error(error);
 
             return res.status(statusCode).json({ statusCode, message, ...metadata });
         });

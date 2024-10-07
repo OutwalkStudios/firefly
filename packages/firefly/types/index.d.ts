@@ -95,13 +95,18 @@ declare module "@outwalk/firefly/express" {
     import type { Platform, Route } from "@outwalk/firefly";
     import type { Request } from "express";
 
+    export interface ExpressOptions { logErrors?: boolean; };
+
     export class ExpressPlatform extends Platform {
+
+        constructor(options?: ExpressOptions);
 
         protected loadController(route: string, middleware: Function[], routes: Route[]): void;
         protected loadErrorHandler(): void;
         protected listen(port: number): void;
 
-        use(...middleware: any[]): void;
+        use(...args: any[]): void;
+        set(...args: any[]): void;
     }
 
     export interface RawBodyRequest extends Request {
@@ -113,8 +118,8 @@ declare module "@outwalk/firefly/mongoose" {
     import type { Decorator, Database } from "@outwalk/firefly";
     import type mongoose from "mongoose";
 
-    export class Schema extends Partial<mongoose.Schema> {}
-    export class Model extends mongoose.Model {}
+    export class Schema extends Partial<mongoose.Schema> { }
+    export class Model extends mongoose.Model { }
 
     export function Entity(options?: mongoose.SchemaOptions): Decorator;
     export function Index(...index: any[]): Decorator;
