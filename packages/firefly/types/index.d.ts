@@ -95,7 +95,7 @@ declare module "@outwalk/firefly/express" {
     import type { Platform, Route } from "@outwalk/firefly";
     import type { Request } from "express";
 
-    export interface ExpressOptions { logErrors?: boolean; };
+    export interface ExpressOptions { logErrors?: boolean; }
 
     export class ExpressPlatform extends Platform {
 
@@ -118,6 +118,7 @@ declare module "@outwalk/firefly/mongoose" {
     import type { Decorator, Database } from "@outwalk/firefly";
     import type mongoose from "mongoose";
 
+    // @ts-ignore - using Partial like this is invalid but it satisifies the compiler for our use case.
     export class Schema extends Partial<mongoose.Schema> { }
     export class Model extends mongoose.Model { }
 
