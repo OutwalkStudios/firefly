@@ -23,7 +23,7 @@ declare module "@outwalk/firefly" {
 
         private static events: Record<string, Function[]>;
 
-        static emit(event: string, payload: any): void;
+        static emit(event: string, payload?: any): void;
         static on(event: string, callback: Function): void;
     }
 
