@@ -19,6 +19,14 @@ declare module "@outwalk/firefly" {
         abstract isConnected(): boolean;
     }
 
+    export class EventEmitter {
+
+        private static events: Record<string, Function[]>;
+
+        static emit(event: string, payload: any): void;
+        static on(event: string, callback: Function): void;
+    }
+
     export class Application {
 
         private platform: Platform;
@@ -44,6 +52,8 @@ declare module "@outwalk/firefly" {
 
     export function Injectable(): Decorator;
     export function Inject(injectable?: string | { new(): any }): Decorator;
+
+    export function Event(event: string): Decorator;
 }
 
 declare module "@outwalk/firefly/errors" {
