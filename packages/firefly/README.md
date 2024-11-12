@@ -26,6 +26,7 @@ npm install @outwalk/firefly
 - [Async Constructors](#async-constructors)
 - [Dependency Injection](#dependency-injection)
 - [Error Handling](#error-handling)
+- [Event Driven Architecture](#event-driven-architecture)
 - [Platform (Express)](#express-platform)
 - [Database (Mongoose)](#mongoose-database)
 - [Custom Integrations](#custom-integrations)
@@ -229,6 +230,38 @@ export class TaskService {
         }
 
         return this.tasks.find((task) => task == req.params.id);
+    }
+}
+```
+
+---
+
+## Event Driven Architecture
+
+Firefly supports utilizing an event driven architecture by utilizing the `EventEmitter` class. Firefly also provides an optional `@Event` decorator to define your event handlers. Unlike other Firefly decorators, this decorator can be used inside any standard class.
+
+You can emit an event and pass any data you would like as the second function argument using the `EventEmitter.emit` method. Additionally in places where the `@Event` decorator is not a viable solution, you can use the `EventEmitter.on` method to define a event listener.
+
+**Example:**
+```js
+import { Controller, EventEmitter, Event } from "@outwalk/firefly";
+
+@Controller()
+export class TaskController {
+
+    constructor() {
+        EventEmitter.on("task.created", (task) => {
+            console.log("Task Created: " + task.name);
+        });
+    }
+
+    createTask() {
+        EventEmitter.emit("task.created", { id: 1, name: "Task 1" });
+    }
+
+    @Event("task.created")
+    onTaskCreated(task) {
+        console.log("Task Created: " + task.name);
     }
 }
 ```
