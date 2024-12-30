@@ -24,7 +24,7 @@ export async function loadInjectables(directory, injectables = {}, root = true) 
             await loadInjectables(path.join(directory, route), injectables, false);
         }
 
-        else if (stat.isFile() && (route.endsWith(".service.js") || route.endsWith(".events.js"))) {
+        else if (stat.isFile() && route.endsWith(".service.js")) {
             const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
 
             for (let name of Object.keys(exports)) {
@@ -109,4 +109,44 @@ export async function loadControllers(root, directory, injectables, controllers 
     }
 
     return controllers;
+}
+
+export async function loadEventListeners(root, directory, injectables, listeners = {}) {
+    const routes = fs.readdirSync(directory);
+
+    for (let route of routes) {
+        const stat = fs.statSync(path.join(directory, route));
+
+        if (stat.isDirectory()) {
+            await loadEventListeners(root, path.join(directory, route), injectables, listeners);
+        }
+
+        else if (stat.isFile() && route.endsWith(".events.js")) {
+            const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
+
+            for (let name of Object.keys(exports)) {
+                if (!exports[name]?._listener) continue;
+
+                const listener = new exports[name]();
+
+                /* inject any injectables */
+                for (let injectable of (listener._injected ?? [])) {
+                    listener[injectable.propertyKey] = injectables[injectable.injectableKey];
+                }
+
+                /* run the event listener init function */
+                if (listener._initMethod) await listener[listener._initMethod]();
+
+                /* get the event emitter injectable instance */
+                const emitter = injectables["EventEmitter"];
+
+                /* attach the events to the event emitter and bind the context to the event listener */
+                for (let event of (listener._events ?? [])) {
+                    emitter.on(event.name, event.handler.bind(listener));
+                }
+            }
+        }
+    }
+
+    return listeners;
 }

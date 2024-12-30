@@ -21,10 +21,10 @@ declare module "@outwalk/firefly" {
 
     export class EventEmitter {
 
-        private static events: Record<string, Function[]>;
+        private events: Record<string, Function[]>;
 
-        static emit(event: string, payload?: any): void;
-        static on(event: string, callback: Function): void;
+        emit(event: string, payload?: any): void;
+        on(event: string, callback: Function): void;
     }
 
     export class Application {
@@ -53,6 +53,7 @@ declare module "@outwalk/firefly" {
     export function Injectable(): Decorator;
     export function Inject(injectable?: string | { new(): any }): Decorator;
 
+    export function EventListener(): Decorator;
     export function Event(event: string): Decorator;
 }
 

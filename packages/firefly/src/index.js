@@ -1,4 +1,5 @@
-import { loadInjectables, loadControllers } from "./modules/core/router";
+import { EventEmitter } from "./modules/core/events";
+import { loadInjectables, loadControllers, loadEventListeners } from "./modules/core/router";
 import { loadPackage } from "./utils/files";
 import { logger } from "./utils/logging";
 
@@ -24,8 +25,11 @@ export class Application {
             }
 
             /* load the injectables and controllers from the filesystem */
-            const injectables = await loadInjectables(root);
+            const injectables = await loadInjectables(root, { "EventEmitter": new EventEmitter() });
             const controllers = await loadControllers(root, root, injectables);
+
+            /* load and attach the event listeners from the file system */
+            await loadEventListeners(root, root, injectables);
 
             Object.entries(controllers).forEach(([route, { middleware, routes }]) => {
                 this.platform.loadController(route, middleware, routes);

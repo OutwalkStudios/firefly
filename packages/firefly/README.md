@@ -238,27 +238,27 @@ export class TaskService {
 
 ## Event Driven Architecture
 
-Firefly supports utilizing an event driven architecture by utilizing the `EventEmitter` class. Firefly also provides an optional `@Event` decorator to define your event handlers. Unlike other Firefly decorators, this decorator can be used inside any standard class.
+Firefly supports utilizing an event driven architecture by utilizing the `EventEmitter` injectable. Firefly also provides an optional `@EventListener` and `@Event` decorator to define your event handlers in files ending with `.events.js`.
 
 You can emit an event and pass any data you would like as the second function argument using the `EventEmitter.emit` method. Additionally in places where the `@Event` decorator is not a viable solution, you can use the `EventEmitter.on` method to define a event listener.
 
-You can utilize `@Injectable` and `@Inject` with dedicated event classes utilizing the `.events.js` file extension.
-
 **Example:**
 ```js
-import { Controller, EventEmitter, Event } from "@outwalk/firefly";
+import { EventListener, EventEmitter, Inject, Event } from "@outwalk/firefly";
 
-@Controller()
-export class TaskController {
+@EventListener()
+export class TaskEvents {
+
+    @Inject() eventEmitter;
 
     constructor() {
-        EventEmitter.on("task.created", (task) => {
+        this.eventEmitter.on("task.created", (task) => {
             console.log("Task Created: " + task.name);
         });
     }
 
     createTask() {
-        EventEmitter.emit("task.created", { id: 1, name: "Task 1" });
+        this.eventEmitter.emit("task.created", { id: 1, name: "Task 1" });
     }
 
     @Event("task.created")
