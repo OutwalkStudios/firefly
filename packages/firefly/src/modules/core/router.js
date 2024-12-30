@@ -24,7 +24,7 @@ export async function loadInjectables(directory, injectables = {}, root = true) 
             await loadInjectables(path.join(directory, route), injectables, false);
         }
 
-        else if (stat.isFile() && route.endsWith(".service.js")) {
+        else if (stat.isFile() && (route.endsWith(".service.js") || route.endsWith(".events.js"))) {
             const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
 
             for (let name of Object.keys(exports)) {
