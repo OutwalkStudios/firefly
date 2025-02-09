@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 
 export class ExpressPlatform extends Platform {
 
-    constructor(options = { logErrors: true }) {
+    constructor(options = { logErrors: false }) {
         super();
 
         this.options = options;
@@ -57,7 +57,7 @@ export class ExpressPlatform extends Platform {
             const message = error.message ?? "Something went wrong.";
             const metadata = error.metadata ?? {};
 
-            if (this.options.logErrors) console.error(error);
+            if (this.options.logErrors || error.statusCode == undefined) console.error(error);
 
             return res.status(statusCode).json({ statusCode, message, ...metadata });
         });
