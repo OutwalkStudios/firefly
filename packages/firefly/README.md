@@ -244,7 +244,8 @@ You can emit an event and pass any data you would like as the second function ar
 
 **Example:**
 ```js
-import { EventListener, EventEmitter, Inject, Event } from "@outwalk/firefly";
+import { Inject } from "@outwalk/firefly";
+import { EventListener, EventEmitter, Event } from "@outwalk/firefly/events";
 
 @EventListener()
 export class TaskEvents {
@@ -442,6 +443,9 @@ Firefly provides a set of commands that power the build process and launching of
 ```
 # build the application
 firefly build
+
+# lint the application's source code
+firefly lint
 
 # start the application
 firefly start

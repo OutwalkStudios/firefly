@@ -1,4 +1,4 @@
-import { EventEmitter } from "./modules/core/events";
+import { EventEmitter } from "./modules/events";
 import { loadInjectables, loadControllers, loadEventListeners } from "./modules/core/router";
 import { loadPackage } from "./utils/files";
 import { logger } from "./utils/logging";
@@ -49,7 +49,6 @@ export class Application {
 
 export * from "./modules/core/controller";
 export * from "./modules/core/injectable";
-export * from "./modules/core/events";
 export * from "./modules/platform/platform";
 export * from "./modules/database/database";
 
