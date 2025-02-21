@@ -11,6 +11,8 @@ export default {
     input: [
         "src/index.js",
         "src/cli/cli.js",
+        "src/modules/eslint.js",
+        "src/modules/events.js",
         "src/modules/errors.js",
         "src/modules/platform/express.js",
         "src/modules/database/mongoose.js",

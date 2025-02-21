@@ -14,6 +14,8 @@ import { typescriptPaths } from "rollup-plugin-typescript-paths";
 import { loadPackage, deleteDirectory } from "../../utils/files";
 import { logger } from "../../utils/logging";
 
+import lint from "./lint";
+
 /* build the project for production */
 export default async function build(args) {
     const isDev = (args.dev || args.d);
@@ -64,6 +66,12 @@ export default async function build(args) {
 
         /* if building for production build and write it to disk */
         if (!isDev) {
+            const result = await lint(args);
+            if (result.isError) {
+                logger.error("unable to complete the build due to errors.");
+                return;
+            }
+
             const bundle = await rollup.rollup(config);
             await bundle.write(config.output);
             await bundle.close();

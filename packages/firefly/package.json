@@ -40,6 +40,16 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs"
     },
+    "./eslint": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/esm/eslint.js",
+      "require": "./dist/cjs/eslint.cjs"
+    },
+    "./events": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/esm/events.js",
+      "require": "./dist/cjs/events.cjs"
+    },
     "./errors": {
       "types": "./types/index.d.ts",
       "import": "./dist/esm/errors.js",
@@ -68,25 +78,24 @@
   "author": "Outwalk Studios <support@outwalkstudios.com> (https://www.outwalkstudios.com/)",
   "license": "MIT",
   "dependencies": {
+    "@eslint/js": "^9.20.0",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
+    "@typescript-eslint/parser": "^8.24.1",
     "chalk": "^4.1.2",
     "chokidar": "^4.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "esbuild": "^0.25.0",
+    "eslint": "^9.20.1",
     "glob": "^11.0.1",
+    "globals": "^15.15.0",
     "nodemon": "^3.1.9",
     "rollup": "^4.34.6",
     "rollup-plugin-esbuild": "^6.2.0",
     "rollup-plugin-typescript-paths": "^1.5.0",
     "yargs-parser": "^21.1.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.20.0",
-    "eslint": "^9.20.0",
-    "globals": "^15.14.0"
   },
   "peerDependenciesMeta": {
     "express": {

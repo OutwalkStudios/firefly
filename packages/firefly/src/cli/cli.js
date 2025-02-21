@@ -6,6 +6,7 @@ import yargs from "yargs-parser";
 import version from "./cmds/version";
 import help from "./cmds/help";
 import build from "./cmds/build";
+import lint from "./cmds/lint";
 import start from "./cmds/start";
 
 import { logger } from "../utils/logging";
@@ -23,6 +24,7 @@ const commands = {
     "version": version,
     "help": help,
     "build": build,
+    "lint": lint,
     "start": start
 };
 

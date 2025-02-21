@@ -19,14 +19,6 @@ declare module "@outwalk/firefly" {
         abstract isConnected(): boolean;
     }
 
-    export class EventEmitter {
-
-        private events: Record<string, Function[]>;
-
-        emit(event: string, payload?: any): void;
-        on(event: string, callback: Function): void;
-    }
-
     export class Application {
 
         private platform: Platform;
@@ -52,9 +44,32 @@ declare module "@outwalk/firefly" {
 
     export function Injectable(): Decorator;
     export function Inject(injectable?: string | { new(): any }): Decorator;
+}
+
+declare module "@outwalk/firefly/events" {
+    import type { Decorator } from "@outwalk/firefly";
+
+    export class EventEmitter {
+
+        private events: Record<string, Function[]>;
+
+        emit(event: string, payload?: any): void;
+        on(event: string, callback: Function): void;
+    }
 
     export function EventListener(): Decorator;
     export function Event(event: string): Decorator;
+}
+
+declare module "@outwalk/firefly/eslint" {
+    declare const firefly: {
+        readonly configs: {
+            readonly language: ReadOnly<Record<string, any>>;
+            readonly recommended: ReadOnly<Record<string, any>>;
+        };
+    };
+
+    export default firefly;
 }
 
 declare module "@outwalk/firefly/errors" {
