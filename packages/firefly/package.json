@@ -90,9 +90,9 @@
     "esbuild": "^0.25.0",
     "eslint": "^9.20.1",
     "glob": "^11.0.1",
-    "globals": "^15.15.0",
+    "globals": "^16.0.0",
     "nodemon": "^3.1.9",
-    "rollup": "^4.34.6",
+    "rollup": "^4.34.8",
     "rollup-plugin-esbuild": "^6.2.0",
     "rollup-plugin-typescript-paths": "^1.5.0",
     "yargs-parser": "^21.1.1"
