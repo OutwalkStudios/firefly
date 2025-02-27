@@ -40,7 +40,7 @@ export default async function build(args) {
 
         /* determine the input files */
         const findInputFiles = () => {
-            const files = globSync("src/**/*.{js,ts}", { ignore: "src/**/*.d.ts" }).map((file) => [
+            const files = globSync("src/**/*.{js,jsx,ts,tsx}", { ignore: "src/**/*.d.ts" }).map((file) => [
                 path.relative("src", file.slice(0, file.length - path.extname(file).length)),
                 path.join(process.cwd(), file)
             ]);
@@ -56,7 +56,7 @@ export default async function build(args) {
                 ...module.builtinModules
             ],
             plugins: [
-                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json" }),
+                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json" }),
                 typescriptPaths({ preserveExtensions: true, tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
                 resolve(),
                 commonjs(),
