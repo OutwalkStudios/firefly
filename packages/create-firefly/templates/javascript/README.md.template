@@ -14,6 +14,9 @@ This command will run your app in development mode.
 - `npm run build` <br/>
 This command will build your app for production.
 
+- `npm run lint` <br/>
+This command will lint your apps source code.
+
 - `npm run start` <br/>
 This command will run your production build.
 

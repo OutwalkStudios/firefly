@@ -9,6 +9,7 @@ const menus = {
         ${firefly("-h, --help")} ........ Output the help menu.
     Commands:
         ${firefly("build")} <options> ........ Builds the Firefly application.
+        ${firefly("lint")} <options> ........ Lints the Firefly application.
         ${firefly("start")} <options> ........ Starts the Firefly application.
 
     For help with a specific command run "firefly [command] --help"
@@ -20,6 +21,14 @@ const menus = {
 
     Options:
         ${firefly("-d, --dev")} ........ Builds the Firefly application in dev mode.
+    `,
+
+    lint: `
+    Usage: ${firefly("firefly lint <options>")}
+    - Lints the Firefly application.
+
+    Options:
+        ${firefly("-f, --fix")} ........ Lints the Firefly application.
     `,
 
     start: `
