@@ -1,6 +1,6 @@
 {
     "name": "@outwalk/create-firefly",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "description": "Firefly - a modern scalable web framework.",
     "main": "dist/index.js",
     "publishConfig": {
