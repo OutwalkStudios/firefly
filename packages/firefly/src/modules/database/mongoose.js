@@ -61,6 +61,9 @@ export function Entity(options) {
 
         const schema = new mongoose.Schema(target._props, options);
 
+        /* load the entity class as a schema to pull in methods, statics, and virtuals */
+        schema.loadClass(target);
+
         /* apply indexes to the schema before compiling the model */
         (target._indexes ?? []).forEach((index) => schema.index(...index));
 
