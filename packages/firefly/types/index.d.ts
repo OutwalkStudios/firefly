@@ -26,7 +26,7 @@ declare module "@outwalk/firefly" {
 
         constructor(options: Options);
 
-        static resolveInjection<T extends new (...args: any[]) => any>(injectable: T): InstanceType<T>;
+        static resolveInjectable<T extends new (...args: any[]) => any>(injectable: T): InstanceType<T>;
 
         listen(port?: number): Promise<void>;
     }
@@ -64,10 +64,10 @@ declare module "@outwalk/firefly/events" {
 }
 
 declare module "@outwalk/firefly/eslint" {
-    declare const firefly: {
+    const firefly: {
         readonly configs: {
-            readonly language: ReadOnly<Record<string, any>>;
-            readonly recommended: ReadOnly<Record<string, any>>;
+            readonly language: Readonly<Record<string, any>>;
+            readonly recommended: Readonly<Record<string, any>>;
         };
     };
 
