@@ -26,6 +26,8 @@ declare module "@outwalk/firefly" {
 
         constructor(options: Options);
 
+        static resolveInjection<T extends new (...args: any[]) => any>(injectable: T): InstanceType<T>;
+
         listen(port?: number): Promise<void>;
     }
 

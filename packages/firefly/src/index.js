@@ -5,6 +5,8 @@ import { logger } from "./utils/logging";
 
 export class Application {
 
+    static injectables = {};
+
     constructor(options = {}) {
         this.platform = options.platform;
         this.database = options.database;
@@ -13,6 +15,12 @@ export class Application {
         this.logging = !process.env.FIREFLY_DISABLE_LOGGING;
     }
 
+    /* resolve an injectable outside the normal lifecycle */
+    static resolveInjectable(injectable) {
+        return Application.injectables[(typeof injectable == "function") ? injectable.name : injectable];
+    }
+
+    /* start the application */
     async listen(port = process.env.PORT ?? 8080) {
         try {
             /* determine the location to load routes from */
@@ -25,11 +33,11 @@ export class Application {
             }
 
             /* load the injectables and controllers from the filesystem */
-            const injectables = await loadInjectables(root, { "EventEmitter": new EventEmitter() });
-            const controllers = await loadControllers(root, root, injectables);
+            Application.injectables = await loadInjectables(root, { "EventEmitter": new EventEmitter() });
+            const controllers = await loadControllers(root, root, Application.injectables);
 
             /* load and attach the event listeners from the file system */
-            await loadEventListeners(root, root, injectables);
+            await loadEventListeners(root, root, Application.injectables);
 
             Object.entries(controllers).forEach(([route, { middleware, routes }]) => {
                 this.platform.loadController(route, middleware, routes);

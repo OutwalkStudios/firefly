@@ -198,6 +198,13 @@ export class TaskController {
 }
 ```
 
+You can also resolve an injection outside the normal lifecycle. This can be done with the `Application.resolveInjection` method.
+
+**Example:**
+```js
+const taskService = Application.resolveInjectable(TaskService)
+```
+
 ---
 
 ## Error Handling
