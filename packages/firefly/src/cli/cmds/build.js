@@ -1,9 +1,9 @@
 import { globSync } from "glob";
-import module from "module";
 import rollup from "rollup";
 import chokidar from "chokidar";
-import path from "path";
-import fs from "fs";
+import module from "node:module";
+import path from "node:path";
+import fs from "node:fs";
 
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";

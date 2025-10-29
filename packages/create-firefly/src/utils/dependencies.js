@@ -1,4 +1,4 @@
-import { spawnSync, exec } from "child_process";
+import { spawnSync, exec } from "node:child_process";
 
 import { logger } from "./logging";
 
