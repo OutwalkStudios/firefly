@@ -48,12 +48,16 @@ export default async function build(args) {
             return Object.fromEntries(files);
         };
 
+        const prefixedModules = ["node:test", "node:test/reporters", "node:sqlite", "node:sea"];
+
         const config = {
             input: findInputFiles(),
             output: { dir: dist, format: isModule ? "esm" : "cjs" },
             external: [
                 ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
-                ...module.builtinModules
+                ...module.builtinModules.map((m) => `node:${m}`),
+                ...module.builtinModules,
+                ...prefixedModules
             ],
             plugins: [
                 esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json" }),
