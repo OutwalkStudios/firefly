@@ -132,3 +132,20 @@ declare module "@outwalk/firefly/express" {
         rawBody?: string;
     }
 }
+
+declare module "@outwalk/firefly/hono" {
+    import type { Platform, Route } from "@outwalk/firefly";
+
+    export interface HonoOptions { logErrors?: boolean; }
+
+    export class HonoPlatform extends Platform {
+
+        constructor(options?: HonoOptions);
+
+        protected loadController(route: string, middleware: Function[], routes: Route[]): void;
+        protected loadErrorHandler(): void;
+        protected listen(port: number): void;
+
+        use(...args: any[]): void;
+    }
+}

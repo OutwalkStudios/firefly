@@ -40,6 +40,7 @@ const questions = [
         message: "Select a platform:",
         choices: [
             { title: "Express", value: "express" },
+            { title: "Hono", value: "hono,@hono/node-server" }
         ]
     }
 ];
@@ -59,7 +60,7 @@ const questions = [
     }
 
     /* add the platform to dependencies */
-    dependencies.push(config.platform);
+    dependencies.push(...config.platform.split(","));
 
     /* change the project name when generating in the current directory */
     if (config.name == ".") {

@@ -28,31 +28,26 @@ npm install @outwalk/firefly
 - [Error Handling](#error-handling)
 - [Event Driven Architecture](#event-driven-architecture)
 - [Platform (Express)](#express-platform)
-- [Database (Mongoose)](#mongoose-database)
-- [Custom Integrations](#custom-integrations)
+- [Platform (Hono)](#hono-platform)
 - [CLI Commands](#cli-commands)
 
 ---
 
 ## Application
 
-Your Firefly application starts with the `Application` interface. This object takes in `platform` and `database` options, loads the application based on the file based routing and decorators, and sends the data to the chosen platform to be converted into functioning http routes. The the application's `listen()` method accepts a port and defaults to 8080. This method is what starts the Firefly application.
+Your Firefly application starts with the `Application` interface. This object takes in a `platform` and loads the application based on the file based routing and decorators, then sends the data to the chosen platform to be converted into functioning http routes. The the application's `listen()` method accepts a port and defaults to `8080`. This method is what starts the Firefly application.
 
 When you start a new Firefly project, your index.js should look something like this:
 
 ```js
 import { Application } from "@outwalk/firefly";
 import { ExpressPlatform } from "@outwalk/firefly/express";
-import { MongooseDatabase } from "@outwalk/firefly/mongoose";
 
 /* setup the platform and global middleware */
 const platform = new ExpressPlatform();
 
-/* setup the database and global plugins */
-const database = new MongooseDatabase();
-
 /* start the application */
-new Application({ platform, database }).listen();
+new Application({ platform }).listen();
 ```
 ---
 
@@ -154,14 +149,14 @@ Firefly heavily relies on classes for its API, you can use the normal class cons
 
 ```js
 import { Controller, Init } from "@outwalk/firefly";
-import { Task } from "./task.entity";
+import { readFile } from "node:fs/promises";
 
 @Controller()
 export class TaskController {
 
     @Init()
     async init() {
-        await Task.create({ name: "task 1" }).exec();
+        const data = await readFile("example.txt", "utf8");
     }
 }
 ```
@@ -280,8 +275,7 @@ export class TaskEvents {
 
 ## Express Platform
 
-Firefly is platform agnostic. The controller decorators provide metadata to the class which is handled by the application interface,
-out of the box, Firefly provides a platform binding for express, enabling integration with the entire express ecosystem.
+Firefly provides an `ExpressPlatform` object for using Express with the firefly architecture, this enables using the entire Express ecosystem directly in firefly.
 
 Firefly also extends the Express Request object by adding a `rawBody` property to it, which is useful for webhook signature validation. When using typescript you can access the request typing for this by importing `RawBodyRequest` from `@outwalk/firefly/express`.
 
@@ -301,144 +295,22 @@ new Application({ platform }).listen();
 
 ---
 
-## Mongoose Database
+## Hono Platform
 
-Firefly is database agnostic. Out of the box, Firefly provides a database object for MongoDB with Mongoose.
-When utilizing a database, you must configure the database connection before running the application. The MongooseDatabase object provides automatic detection of the `DATABASE_URL` environment variable, this is the suggested method of connecting but you can also pass a url option to the MongooseDatabase constructor.
+Firefly provides an `HonoPlatform` object for using Hono with the firefly architecture, this enables using the entire Hono ecosystem directly in firefly.
 
 **Example:**
 ```js
 import { Application } from "@outwalk/firefly";
-import { ExpressPlatform } from "@outwalk/firefly/express";
-import { MongooseDatabase } from "@outwalk/firefly/mongoose";
+import { HonoPlatform } from "@outwalk/firefly/hono";
+import { cors } from "hono/cors";
 
 /* setup the platform and global middleware */
-const platform = new ExpressPlatform();
-
-/* setup the database and global plugins */
-const database = new MongooseDatabase();
-database.plugin(import("mongoose-autopopulate"));
+const platform = new HonoPlatform();
+platform.use(cors());
 
 /* start the application */
-new Application({ platform, database }).listen();
-```
-
-Firefly also provides additional helper decorators such as `@Entity()` and `@Prop()`. In order for the entity decorator to properly understand how to compile your entity, you must extend either `Model` or `Schema` which are the direct mongoose objects with modified types. For defining virtual properties, Firefly provides the `@Virtual()` decorator which can be used in place of the `@Prop()` decorator.
-
-**Example:**
-```js
-import { Entity, Model, Prop } from "@outwalk/firefly/mongoose";
-
-@Entity()
-export class Task extends Model {
-
-    @Prop(String) name;
-
-    @Prop(Boolean) isDone;
-}
-```
-
-In cases where you have a complex prop with nested properties, you may want to use a Subdocument. Firefly supports this via the `@Entity()` decorator, this allows you to create a class that supports all the same features as a normal entity, but rather than extend `Model` and be in its own collection, you can extend `Schema` and nest it inside another entity. this works similar to a entity reference but does not require populating it.
-
-**Example:**
-```js
-import { Entity, Schema, Model, Prop } from "@outwalk/firefly/mongoose";
-
-@Entity()
-export class Price extends Schema {
-
-    @Prop(String) currency;
-
-    @Prop(Number) amount;
-}
-
-@Entity()
-export class Product extends Model {
-
-    @Prop(String) name;
-
-    @Prop(Price) price;
-}
-```
-
-Mongoose plugins are supported via `@Plugin()` decoraotr. These plugins will only apply to the current entity. Its worth noting that these plugins are required to be static imports because the Entity decorator is unable to resolve dynamic imports before the model is compiled.
-
-**Example:**
-```js
-import { Entity, Plugin } from "@outwalk/firefly/mongoose";
-import mongooseAutoPopulate from "mongoose-autopopulate";
-
-@Entity()
-@Plugin(mongooseAutoPopulate)
-```
-
-Firefly also provides support for defining an index on the Mongoose schema. This can be done via the `@Index()` decorator.
-
-**Example:**
-```js
-import { Entity, Index } from "@outwalk/firefly/mongoose";
-
-@Entity()
-@Index({ name: "text" }, { weights: { name: 10 } })
-```
-
-In more complex cases you may want to extend from another entity. For example, this enables the ability to have an array typed with a super class that all sub classes can be stored in.
-In mongoose you can do this using the `Model.discriminator` function. This can still be done with the entity decorator, however you can also just extend the parent model like any other class.
-
-**Example:**
-```js
-import { Entity, Model, Prop } from "@outwalk/firefly/mongoose";
-
-@Entity()
-export class Animal extends Model { ... }
-
-@Entity()
-export class Dog extends Animal { ... }
-
-@Entity()
-export class Person extends Model {
-
-    @Prop([Animal]) pets;
-}
-
-const person = await Person.findOne(...).exec();
-person.pets.push(new Dog());
-```
-
----
-
-## Custom Integrations
-
-Firefly provides `Platform` and `Database` classes to create your own integrations for use with the Firefly framework. Instances of these objects can be passed into the Application interface. The Database interface provides a `displayConnectionMessage()` method to only display the connection message on the first load.
-
-**Platform Example:**
-```js
-import { Platform } from "@outwalk/firefly";
-
-class CustomPlatform extends Platform {
-    
-    loadController(route, middleware, routes) {}
-
-    loadErrorHandler() {}
-
-    listen(port) {}
-}
-```
-
-**Database Example:**
-```js
-import { Database } from "@outwalk/firefly";
-
-class CustomDatabase extends Database {
-    
-    async connect() {
-        super.displayConnectionMessage();
-    }
-
-    isConnected() { 
-        return false
-    }
-}
+new Application({ platform }).listen();
 ```
 
 ---

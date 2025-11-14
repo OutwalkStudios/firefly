@@ -16,7 +16,7 @@ export default {
         "src/modules/events.js",
         "src/modules/errors.js",
         "src/modules/platform/express.js",
-        "src/modules/database/mongoose.js",
+        "src/modules/platform/hono.js",
     ],
     output: [
         { dir: "dist/cjs", format: "cjs", entryFileNames: "[name].cjs", chunkFileNames: "[name].cjs" },

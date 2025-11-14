@@ -1,2 +1,2 @@
 /* setup the platform and global middleware */
-const platform = new FastifyPlatform();
+const platform = new HonoPlatform();
