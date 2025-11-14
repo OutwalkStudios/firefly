@@ -1,6 +1,7 @@
 import { globSync } from "glob";
 import rollup from "rollup";
 import chokidar from "chokidar";
+import { execSync } from "node:child_process";
 import module from "node:module";
 import path from "node:path";
 import fs from "node:fs";
@@ -40,6 +41,9 @@ export default async function build(args) {
 
         /* delete existing files in the dist folder */
         deleteDirectory(dist, false);
+
+        /* run tsc for typechecking */
+        if (isTypeScript) execSync("tsc", { stdio: "inherit" });
 
         /* determine the input files */
         const findInputFiles = () => {

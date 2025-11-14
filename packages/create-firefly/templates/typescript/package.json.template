@@ -8,7 +8,7 @@
     "npm": "^10"
   },
   "scripts": {
-    "build": "tsc && firefly build",
+    "build": "firefly build",
     "lint": "firefly lint",
     "start": "firefly start",
     "dev": "firefly start --dev"
