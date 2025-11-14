@@ -3,6 +3,7 @@
     "compilerOptions": {
         /* features */
         "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "useDefineForClassFields": true,
         
         /* syntax */
@@ -15,8 +16,9 @@
         /* bundler mode */
         "moduleResolution": "Bundler",
         "allowImportingTsExtensions": true,
+        "rewriteRelativeImportExtensions": true,
         "resolveJsonModule": true,
-        "isolatedModules": true,
+        "isolatedModules": false,
         "noEmit": true,
 
         /* import path aliases */
