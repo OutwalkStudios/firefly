@@ -9,6 +9,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
+import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 
 import { loadPackage, deleteDirectory } from "../../utils/files";
@@ -32,6 +33,8 @@ export default async function build(args) {
         const isModule = (type != undefined) ? (type == "module") ? true : false : false;
         const dist = main.split("/")[0];
 
+        const prefixedModules = ["node:test", "node:test/reporters", "node:sqlite", "node:sea"];
+
         /* determine the node version being targeted */
         const [version] = (engines?.node ?? process.versions.node.split(".")[0]).match(/\d+[^.|]/g);
 
@@ -48,8 +51,6 @@ export default async function build(args) {
             return Object.fromEntries(files);
         };
 
-        const prefixedModules = ["node:test", "node:test/reporters", "node:sqlite", "node:sea"];
-
         const config = {
             input: findInputFiles(),
             output: { dir: dist, format: isModule ? "esm" : "cjs" },
@@ -60,7 +61,8 @@ export default async function build(args) {
                 ...prefixedModules
             ],
             plugins: [
-                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json" }),
+                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json", exclude: /.entity(?:\.ts)?$/ }),
+                isTypeScript && typescript({ include: /.entity(?:\.ts)?$/ }),
                 typescriptPaths({ preserveExtensions: true, tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
                 resolve(),
                 commonjs(),

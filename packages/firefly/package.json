@@ -22,7 +22,6 @@
   },
   "keywords": [
     "express",
-    "mongoose",
     "decorators",
     "dependency",
     "injection",
@@ -59,11 +58,6 @@
       "types": "./types/index.d.ts",
       "import": "./dist/esm/express.js",
       "require": "./dist/cjs/express.cjs"
-    },
-    "./mongoose": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/esm/mongoose.js",
-      "require": "./dist/cjs/mongoose.cjs"
     }
   },
   "repository": {
@@ -82,6 +76,7 @@
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@typescript-eslint/parser": "^8.46.2",
     "chalk": "^4.1.2",
     "chokidar": "^4.0.3",
@@ -98,15 +93,14 @@
     "yargs-parser": "^22.0.0"
   },
   "peerDependenciesMeta": {
-    "express": {
+    "typescript": {
       "optional": true
     },
-    "mongoose": {
+    "express": {
       "optional": true
     }
   },
   "peerDependencies": {
-    "express": "^5.1.0",
-    "mongoose": "^8.19.2"
+    "express": "^5.1.0"
   }
 }
