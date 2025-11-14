@@ -22,6 +22,7 @@
   },
   "keywords": [
     "express",
+    "hono",
     "decorators",
     "dependency",
     "injection",
