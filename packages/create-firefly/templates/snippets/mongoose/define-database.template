@@ -1,2 +1,0 @@
-/* setup the database and global plugins */
-const database = new MongooseDatabase();

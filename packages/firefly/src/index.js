@@ -9,7 +9,6 @@ export class Application {
 
     constructor(options = {}) {
         this.platform = options.platform;
-        this.database = options.database;
 
         /* make sure we dont log the startup message on each reload when in dev mode */
         this.logging = !process.env.FIREFLY_DISABLE_LOGGING;
@@ -26,11 +25,6 @@ export class Application {
             /* determine the location to load routes from */
             const { main } = loadPackage();
             const root = main.split("/")[0];
-
-            /* if a database object is provided and not yet connected, start the connection */
-            if (this.database && !this.database.isConnected()) {
-                await this.database.connect();
-            }
 
             /* load the injectables and controllers from the filesystem */
             Application.injectables = await loadInjectables(root, { "EventEmitter": new EventEmitter() });
@@ -58,6 +52,5 @@ export class Application {
 export * from "./modules/core/controller";
 export * from "./modules/core/injectable";
 export * from "./modules/platform/platform";
-export * from "./modules/database/database";
 
 export { Init } from "./modules/core/router";

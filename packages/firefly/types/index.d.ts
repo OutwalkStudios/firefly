@@ -1,6 +1,6 @@
 declare module "@outwalk/firefly" {
     export interface Route { method: string, middleware: Function[], route: string, handler: Function }
-    export interface Options { platform: Platform, database?: Database }
+    export interface Options { platform: Platform }
 
     export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
@@ -11,18 +11,9 @@ declare module "@outwalk/firefly" {
         protected abstract listen(port: number): void;
     }
 
-    export abstract class Database {
-
-        initialize(): void;
-
-        abstract connect(): Promise<Database>;
-        abstract isConnected(): boolean;
-    }
-
     export class Application {
 
         private platform: Platform;
-        private database: Database;
 
         constructor(options: Options);
 
@@ -139,31 +130,5 @@ declare module "@outwalk/firefly/express" {
 
     export interface RawBodyRequest extends Request {
         rawBody?: string;
-    }
-}
-
-declare module "@outwalk/firefly/mongoose" {
-    import type { Decorator, Database } from "@outwalk/firefly";
-    import type mongoose from "mongoose";
-
-    // @ts-ignore - using Partial like this is invalid but it satisifies the compiler for our use case.
-    export class Schema extends Partial<mongoose.Schema> { }
-    export class Model extends mongoose.Model { }
-
-    export function Entity(options?: mongoose.SchemaOptions): Decorator;
-    export function Index(...index: any[]): Decorator;
-    export function Plugin(plugin: any): Decorator;
-    export function Prop(type: Object | mongoose.Schema): Decorator;
-    export function Virtual(virtual: mongoose.VirtualTypeOptions): Decorator;
-
-    export class MongooseDatabase extends Database {
-
-        constructor(options?: { url?: string; } & mongoose.ConnectOptions);
-
-        plugin(plugin: any): void;
-        connect(): Promise<MongooseDatabase>;
-        isConnected(): boolean;
-
-        static get connection(): mongoose.Connection;
     }
 }
