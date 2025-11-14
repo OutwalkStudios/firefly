@@ -61,7 +61,7 @@ export default async function build(args) {
                 ...prefixedModules
             ],
             plugins: [
-                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json", exclude: /.entity(?:\.ts)?$/ }),
+                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json", exclude: isTypeScript ? /.entity(?:\.ts)?$/ : undefined }),
                 isTypeScript && typescript({ include: /.entity(?:\.ts)?$/ }),
                 typescriptPaths({ preserveExtensions: true, tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
                 resolve(),
