@@ -105,8 +105,9 @@ const questions = [
         template.inject("project-name", config.name);
 
         /* apply platform snippets to the template */
-        template.snippet("import-platform", path.join(snippetPath, config.platform, "import-platform.template"));
-        template.snippet("define-platform", path.join(snippetPath, config.platform, "define-platform.template"));
+        const platform = config.platform.split(",")[0];
+        template.snippet("import-platform", path.join(snippetPath, platform, "import-platform.template"));
+        template.snippet("define-platform", path.join(snippetPath, platform, "define-platform.template"));
 
         template.build();
     } catch (error) {
