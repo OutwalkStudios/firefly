@@ -10,7 +10,7 @@ const prefixedModules = ["node:test", "node:test/reporters", "node:sqlite", "nod
 
 export default {
     input: "src/index.js",
-    output: { file: "dist/index.js", format: "cjs" },
+    output: { file: "dist/index.js", format: "esm" },
     external: [
         ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
         ...module.builtinModules.map((m) => `node:${m}`),
