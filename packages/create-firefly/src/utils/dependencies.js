@@ -1,5 +1,4 @@
 import { spawnSync, exec } from "node:child_process";
-
 import { logger } from "./logging";
 
 /* install the dependencies required for a project */

@@ -17,6 +17,10 @@ prompts.override({
     platform: args.p ?? args.platform,
 });
 
+/* platforms */
+const express = { template: "express", dependencies: ["express"] };
+const hono = { template: "hono", dependencies: ["hono", "@hono/node-server"] };
+
 /* questions for project creation */
 const questions = [
     {
@@ -39,8 +43,8 @@ const questions = [
         name: "platform",
         message: "Select a platform:",
         choices: [
-            { title: "Express", value: "express" },
-            { title: "Hono", value: "hono,@hono/node-server" }
+            { title: "Express", value: JSON.stringify(express) },
+            { title: "Hono", value: JSON.stringify(hono) }
         ]
     }
 ];
@@ -51,16 +55,14 @@ const questions = [
     const skipGit = args["skip-git"];
     const force = args["force"];
 
+    const platform = JSON.parse(config.platform);
     const settings = { useCurrentDirectory: false };
-    const dependencies = ["@outwalk/firefly"];
+    const dependencies = ["@outwalk/firefly", ...platform.dependencies];
 
     /* add the language dependency if its an npm package */
     if (config.language != "javascript") {
         dependencies.push(config.language);
     }
-
-    /* add the platform to dependencies */
-    dependencies.push(...config.platform.split(","));
 
     /* change the project name when generating in the current directory */
     if (config.name == ".") {
@@ -105,9 +107,8 @@ const questions = [
         template.inject("project-name", config.name);
 
         /* apply platform snippets to the template */
-        const platform = config.platform.split(",")[0];
-        template.snippet("import-platform", path.join(snippetPath, platform, "import-platform.template"));
-        template.snippet("define-platform", path.join(snippetPath, platform, "define-platform.template"));
+        template.snippet("import-platform", path.join(snippetPath, platform.template, "import-platform.template"));
+        template.snippet("define-platform", path.join(snippetPath, platform.template, "define-platform.template"));
 
         template.build();
     } catch (error) {
