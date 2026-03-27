@@ -33,9 +33,6 @@ The first argument passed to the command will be used as the project name/direct
 # Specify the platform
 -p, --platform
 
-# Specify the database
--d, --database
-
 # Prevent automatic dependency installation
 --skip-install
 

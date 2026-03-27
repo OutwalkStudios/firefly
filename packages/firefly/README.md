@@ -27,6 +27,7 @@ npm install @outwalk/firefly
 - [Dependency Injection](#dependency-injection)
 - [Error Handling](#error-handling)
 - [Event Driven Architecture](#event-driven-architecture)
+- [Database Integration](#database-integration)
 - [Platform (Express)](#express-platform)
 - [Platform (Hono)](#hono-platform)
 - [CLI Commands](#cli-commands)
@@ -271,6 +272,33 @@ export class TaskEvents {
 }
 ```
 
+---
+
+## Database Integration
+
+Firefly does not have any opinion on what database you use, you are free to bring in whatever database and ORM you prefer. However, Firefly does support special handling for files ending in `.entity.ts`.
+Specicially when using TypeScript, entity files have an extra compiler step that supports decorator metadata. This enables the use of ORMs such as [TypeORM](https://typeorm.io/) and [MikroORM](https://mikro-orm.io/).
+
+**TypeORM Example**
+```js
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+
+@Entity()
+export class User {
+
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    firstName: string;
+
+    @Column()
+    lastName: string;
+
+    @Column()
+    isActive: boolean;
+}
+```
 ---
 
 ## Express Platform
