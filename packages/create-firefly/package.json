@@ -1,8 +1,8 @@
 {
     "name": "@outwalk/create-firefly",
+    "type": "module",
     "version": "0.14.1",
     "description": "Firefly - a modern scalable web framework.",
-    "main": "dist/index.js",
     "publishConfig": {
         "access": "public"
     },
@@ -18,11 +18,13 @@
         "prepublishOnly": "npm run lint && npm run build"
     },
     "keywords": [
-        "outwalk",
         "express",
         "hono",
         "decorators",
-        "mvc"
+        "project",
+        "generator",
+        "framework",
+        "templates"
     ],
     "files": [
         "dist",
@@ -45,14 +47,14 @@
         "yargs-parser": "^22.0.0"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.1",
-        "@rollup/plugin-commonjs": "^29.0.0",
+        "@eslint/js": "^10.0.1",
+        "@rollup/plugin-commonjs": "^29.0.2",
         "@rollup/plugin-json": "^6.1.0",
         "@rollup/plugin-node-resolve": "^16.0.3",
-        "esbuild": "^0.27.0",
-        "eslint": "^9.39.1",
-        "globals": "^16.5.0",
-        "rollup": "^4.53.2",
+        "esbuild": "^0.27.4",
+        "eslint": "^10.1.0",
+        "globals": "^17.4.0",
+        "rollup": "^4.60.0",
         "rollup-plugin-esbuild": "^6.2.1"
     }
 }
