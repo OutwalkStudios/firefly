@@ -1,7 +1,7 @@
 {
     "name": "@outwalk/create-firefly",
     "type": "module",
-    "version": "0.14.1",
+    "version": "0.14.2",
     "description": "Firefly - a modern scalable web framework.",
     "publishConfig": {
         "access": "public"
