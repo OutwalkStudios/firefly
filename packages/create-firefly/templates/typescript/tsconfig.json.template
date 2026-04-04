@@ -22,10 +22,9 @@
         "noEmit": true,
 
         /* import path aliases */
-        "baseUrl": "./src",
         "paths": {
             "@/*": [
-                "./*"
+                "./src/*"
             ]
         }
     }
