@@ -19,12 +19,14 @@ npm create @outwalk/firefly@latest
 You can also specify settings via command line options.
 
 ```
-npm create @outwalk/firefly@latest my-app --language typescript
+npm create @outwalk/firefly@latest my-app -- --language typescript
 ```
 
 ### Command Line Options.
 
 The first argument passed to the command will be used as the project name/directory, Other settings can be configured using the following command line options:
+
+NOTE: Command line options are only applied if used after an additional `--` marker.
 
 ```
 # Specify the language
