@@ -8,6 +8,7 @@ import fs from "node:fs";
 import { logger, firefly } from "./utils/logging";
 import { TemplateBuilder } from "./utils/template";
 import { installDependencies, intitializeGitRepository } from "./utils/dependencies";
+import { Module } from "./utils/files";
 
 /* parse the cli arguments and preset any prompt values */
 const args = yargs(process.argv.slice(2));
@@ -95,8 +96,8 @@ const questions = [
     logger.log(`creating ${config.name}...`);
 
     /* find the template paths */
-    const templatePath = path.join(__dirname, "../templates/", config.language);
-    const snippetPath = path.join(__dirname, "../templates/snippets");
+    const templatePath = path.join(Module.__dirname(import.meta.url), "../templates/", config.language);
+    const snippetPath = path.join(Module.__dirname(import.meta.url), "../templates/snippets");
     const projectPath = !settings.useCurrentDirectory ? config.name : ".";
 
     /* Start copying template files to the destination */
