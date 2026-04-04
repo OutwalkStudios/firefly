@@ -1,7 +1,7 @@
 {
   "name": "@outwalk/firefly",
   "type": "module",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "description": "Firefly - a modern scalable web framework.",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
@@ -91,6 +91,7 @@
     "eslint": "^10.1.0",
     "glob": "^13.0.6",
     "globals": "^17.4.0",
+    "jiti": "^2.6.1",
     "nodemon": "^3.1.14",
     "rollup": "^4.60.0",
     "rollup-plugin-esbuild": "^6.2.1",
