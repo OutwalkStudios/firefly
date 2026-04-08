@@ -45,7 +45,8 @@ const questions = [
         message: "Select a platform:",
         choices: [
             { title: "Express", value: JSON.stringify(express) },
-            { title: "Hono", value: JSON.stringify(hono) }
+            { title: "Hono", value: JSON.stringify(hono) },
+            { title: "No Platform (Node)", value: null, }
         ]
     }
 ];
@@ -58,7 +59,7 @@ const questions = [
 
     const platform = JSON.parse(config.platform);
     const settings = { useCurrentDirectory: false };
-    const dependencies = ["@outwalk/firefly", ...platform.dependencies];
+    const dependencies = ["@outwalk/firefly", ...(platform?.dependencies ?? [])];
 
     /* add the language dependency if its an npm package */
     if (config.language != "javascript") {
@@ -106,10 +107,16 @@ const questions = [
 
         /* inject global template variables */
         template.inject("project-name", config.name);
+        template.inject("options", !platform ? "" : "{ platform }");
 
         /* apply platform snippets to the template */
-        template.snippet("import-platform", path.join(snippetPath, platform.template, "import-platform.template"));
-        template.snippet("define-platform", path.join(snippetPath, platform.template, "define-platform.template"));
+        if (platform) {
+            template.snippet("import-platform", path.join(snippetPath, platform.template, "import-platform.template"));
+            template.snippet("define-platform", path.join(snippetPath, platform.template, "define-platform.template"));
+        } else {
+            template.inject("import-platform", "");
+            template.inject("define-platform", "");
+        }
 
         template.build();
     } catch (error) {

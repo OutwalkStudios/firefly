@@ -4,4 +4,4 @@ import { Application } from "@outwalk/firefly";
 {{define-platform}}
 
 /* start the application */
-new Application({ platform }).listen();
+new Application({{options}}).listen();

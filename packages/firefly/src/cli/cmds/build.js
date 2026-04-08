@@ -11,7 +11,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
 import typescript from "@rollup/plugin-typescript";
-import { typescriptPaths } from "rollup-plugin-typescript-paths";
+import typescriptPaths from "rollup-plugin-tsconfig-paths";
 
 import { loadPackage, deleteDirectory } from "../../utils/files";
 import { logger } from "../../utils/logging";
@@ -67,7 +67,7 @@ export default async function build(args) {
             plugins: [
                 esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json", exclude: isTypeScript ? /.entity(?:\.ts)?$/ : undefined }),
                 isTypeScript && typescript({ include: /.entity(?:\.ts)?$/ }),
-                typescriptPaths({ preserveExtensions: true, tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
+                typescriptPaths({ tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
                 resolve(),
                 commonjs(),
                 json()

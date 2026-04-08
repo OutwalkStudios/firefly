@@ -8,7 +8,7 @@ export class Application {
     static injectables = {};
 
     constructor(options = {}) {
-        this.platform = options.platform;
+        this.platform = options?.platform ?? null;
 
         /* make sure we dont log the startup message on each reload when in dev mode */
         this.logging = !process.env.FIREFLY_DISABLE_LOGGING;
@@ -33,6 +33,10 @@ export class Application {
             /* load and attach the event listeners from the file system */
             await loadEventListeners(root, root, Application.injectables);
 
+            /* if no platform is configured, skip platform only features */
+            if (!this.platform) return;
+
+            /* register the loaded controllers with the platform */
             Object.entries(controllers).forEach(([route, { middleware, routes }]) => {
                 this.platform.loadController(route, middleware, routes);
             });

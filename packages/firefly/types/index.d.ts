@@ -1,6 +1,6 @@
 declare module "@outwalk/firefly" {
     export interface Route { method: string, middleware: Function[], route: string, handler: Function }
-    export interface Options { platform: Platform }
+    export interface Options { platform?: Platform }
 
     export type Decorator = (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => void;
 
@@ -15,7 +15,7 @@ declare module "@outwalk/firefly" {
 
         private platform: Platform;
 
-        constructor(options: Options);
+        constructor(options?: Options);
 
         static resolveInjectable<T extends new (...args: any[]) => any>(injectable: T): InstanceType<T>;
 
@@ -59,6 +59,7 @@ declare module "@outwalk/firefly/eslint" {
         readonly configs: {
             readonly language: Readonly<Record<string, any>>;
             readonly recommended: Readonly<Record<string, any>>;
+            readonly plugins: Readonly<Record<string, any>>;
         };
     };
 

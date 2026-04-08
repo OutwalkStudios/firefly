@@ -1,4 +1,5 @@
-import typescript from "@typescript-eslint/parser";
+import typescriptParser from "@typescript-eslint/parser";
+import typescriptPlugin from "@typescript-eslint/eslint-plugin";
 import globals from "globals";
 import js from "@eslint/js";
 
@@ -6,7 +7,7 @@ export default {
     configs: {
         language: {
             globals: { ...globals.node },
-            parser: typescript
+            parser: typescriptParser
         },
         recommended: {
             ...js.configs.recommended.rules,
@@ -20,7 +21,12 @@ export default {
             }],
             "linebreak-style": ["error", "unix"],
             "quotes": ["error", "double", { "allowTemplateLiterals": true }],
-            "semi": ["error", "always"]
-        }
+            "semi": ["error", "always"],
+            "no-unused-vars": "off",
+            "@typescript-eslint/no-unused-vars": "error"
+        },
+        plugins: {
+            "@typescript-eslint": typescriptPlugin
+        },
     }
 };

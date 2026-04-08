@@ -64,7 +64,7 @@ export class TemplateBuilder {
                 content = content.replace(new RegExp(`{{${key}}}`, "g"), values[key]);
             }
 
-            return content;
+            return content.replace(/\n{3,}/g, "\n\n");
         };
 
         for (let file of filesToCreate) {
