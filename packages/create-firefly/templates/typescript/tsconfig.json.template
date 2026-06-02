@@ -7,10 +7,11 @@
         "useDefineForClassFields": true,
         
         /* syntax */
-        "target": "ES2020",
+        "target": "ES2025",
         "module": "ESNext",
-        "lib": ["ES2020"],
+        "lib": ["ES2025"],
         "jsx": "preserve",
+        "types": ["node"],
         "skipLibCheck": true,
 
         /* bundler mode */
