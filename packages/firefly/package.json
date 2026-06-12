@@ -79,22 +79,22 @@
   "license": "MIT",
   "dependencies": {
     "@eslint/js": "^10.0.1",
-    "@rollup/plugin-commonjs": "^29.0.2",
+    "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.58.1",
-    "@typescript-eslint/parser": "^8.58.1",
+    "@typescript-eslint/eslint-plugin": "^8.61.0",
+    "@typescript-eslint/parser": "^8.61.0",
     "chalk": "^4.1.2",
     "chokidar": "^5.0.0",
-    "dotenv": "^17.4.1",
-    "esbuild": "^0.28.0",
-    "eslint": "^10.2.0",
+    "dotenv": "^17.4.2",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.5.0",
     "glob": "^13.0.6",
-    "globals": "^17.4.0",
-    "jiti": "^2.6.1",
+    "globals": "^17.6.0",
+    "jiti": "^2.7.0",
     "nodemon": "^3.1.14",
-    "rollup": "^4.60.1",
+    "rollup": "^4.61.1",
     "rollup-plugin-esbuild": "^6.2.1",
     "rollup-plugin-tsconfig-paths": "^1.5.2",
     "tslib": "^2.8.1",
@@ -115,8 +115,8 @@
     }
   },
   "peerDependencies": {
-    "@hono/node-server": "^1.19.11",
+    "@hono/node-server": "^2.0.4",
     "express": "^5.2.1",
-    "hono": "^4.12.9"
+    "hono": "^4.12.25"
   }
 }
