@@ -7,9 +7,9 @@ export class EventEmitter {
 
     events = {};
 
-    emit(event, payload) {
+    async emit(event, payload) {
         if (!this.events[event]) return;
-        this.events[event].forEach((callback) => callback(payload));
+        await Promise.all(this.events[event].map((callback) => callback(payload)));
     }
 
     on(event, handler) {

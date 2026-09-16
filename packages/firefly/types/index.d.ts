@@ -46,7 +46,7 @@ declare module "@outwalk/firefly/events" {
 
         private events: Record<string, Function[]>;
 
-        emit(event: string, payload?: any): void;
+        emit(event: string, payload?: any): Promise<void>;
         on(event: string, callback: Function): void;
     }
 

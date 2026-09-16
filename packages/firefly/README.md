@@ -245,6 +245,8 @@ Firefly supports utilizing an event driven architecture by utilizing the `EventE
 
 You can emit an event and pass any data you would like as the second function argument using the `EventEmitter.emit` method. Additionally in places where the `@Event` decorator is not a viable solution, you can use the `EventEmitter.on` method to define a event listener.
 
+In cases where you want to stop further code execution until all the emitted events has completed, you can await its returned promise.
+
 **Example:**
 ```js
 import { Inject } from "@outwalk/firefly";
