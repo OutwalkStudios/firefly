@@ -1,14 +1,11 @@
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import json from "@rollup/plugin-json";
-import esbuild from "rollup-plugin-esbuild";
+import { defineConfig } from "rolldown";
 import module from "node:module";
 import fs from "node:fs";
 
 const { dependencies, peerDependencies } = JSON.parse(fs.readFileSync(new URL("./package.json", import.meta.url)));
 const prefixedModules = ["node:test", "node:test/reporters", "node:sqlite", "node:sea"];
 
-export default {
+export default defineConfig({
     input: [
         "src/index.js",
         "src/cli/cli.js",
@@ -28,10 +25,5 @@ export default {
         ...module.builtinModules,
         ...prefixedModules
     ],
-    plugins: [
-        resolve(),
-        commonjs(),
-        json(),
-        esbuild({ target: "node22" })
-    ]
-}
+    transform: { target: "node22" }
+});

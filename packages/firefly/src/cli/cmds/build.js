@@ -1,17 +1,10 @@
 import { globSync } from "glob";
-import rollup from "rollup";
+import { defineConfig, rolldown, watch } from "rolldown";
 import chokidar from "chokidar";
 import { execSync } from "node:child_process";
 import module from "node:module";
 import path from "node:path";
 import fs from "node:fs";
-
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import json from "@rollup/plugin-json";
-import esbuild from "rollup-plugin-esbuild";
-import typescript from "@rollup/plugin-typescript";
-import typescriptPaths from "rollup-plugin-tsconfig-paths";
 
 import { loadPackage, deleteDirectory } from "../../utils/files";
 import { logger } from "../../utils/logging";
@@ -43,7 +36,9 @@ export default async function build(args) {
         deleteDirectory(dist, false);
 
         /* run tsc for typechecking */
-        if (isTypeScript) execSync("tsc", { stdio: "inherit" });
+        if (isTypeScript && Object.keys(dependencies).includes("typescript")) {
+            execSync("tsc", { stdio: "inherit" });
+        }
 
         /* determine the input files */
         const findInputFiles = () => {
@@ -55,24 +50,18 @@ export default async function build(args) {
             return Object.fromEntries(files);
         };
 
-        const config = {
+        const config = defineConfig({
             input: findInputFiles(),
+            transform: { target: `node${version}` },
             output: { dir: dist, format: isModule ? "esm" : "cjs" },
+            tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json",
             external: [
                 ...Object.keys(dependencies).map((dependency) => new RegExp("^" + dependency + "(\\/.+)*$")),
                 ...module.builtinModules.map((m) => `node:${m}`),
                 ...module.builtinModules,
                 ...prefixedModules
-            ],
-            plugins: [
-                esbuild.default({ target: `node${version}`, loaders: { ".js": "ts", ".jsx": "tsx" }, tsconfig: isTypeScript ? "tsconfig.json" : "jsconfig.json", exclude: isTypeScript ? /.entity(?:\.ts)?$/ : undefined }),
-                isTypeScript && typescript({ include: /.entity(?:\.ts)?$/ }),
-                typescriptPaths({ tsConfigPath: path.join(process.cwd(), isTypeScript ? "tsconfig.json" : "jsconfig.json") }),
-                resolve(),
-                commonjs(),
-                json()
             ]
-        };
+        });
 
         /* if building for production build and write it to disk */
         if (!isDev) {
@@ -82,7 +71,7 @@ export default async function build(args) {
                 return;
             }
 
-            const bundle = await rollup.rollup(config);
+            const bundle = await rolldown(config);
             await bundle.write(config.output);
             await bundle.close();
 
@@ -94,7 +83,7 @@ export default async function build(args) {
         const startWatchMode = () => {
             config.input = findInputFiles();
             config.watch = { exclude: "node_modules/**" };
-            const watcher = rollup.watch(config);
+            const watcher = watch(config);
 
             watcher.on("event", (event) => {
                 switch (event.code) {
