@@ -22,7 +22,6 @@
   },
   "keywords": [
     "express",
-    "hono",
     "decorators",
     "dependency",
     "injection",
@@ -59,11 +58,6 @@
       "types": "./types/index.d.ts",
       "import": "./dist/esm/express.js",
       "require": "./dist/cjs/express.cjs"
-    },
-    "./hono": {
-      "types": "./types/index.d.ts",
-      "import": "./dist/esm/hono.js",
-      "require": "./dist/cjs/hono.cjs"
     }
   },
   "repository": {
@@ -106,17 +100,9 @@
     },
     "express": {
       "optional": true
-    },
-    "hono": {
-      "optional": true
-    },
-    "@hono/node-server": {
-      "optional": true
     }
   },
   "peerDependencies": {
-    "@hono/node-server": "^2.0.4",
-    "express": "^5.2.1",
-    "hono": "^4.12.25"
+    "express": "^5.2.1"
   }
 }

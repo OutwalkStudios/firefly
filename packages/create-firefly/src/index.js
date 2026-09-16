@@ -20,7 +20,6 @@ prompts.override({
 
 /* platforms */
 const express = { template: "express", dependencies: ["express"] };
-const hono = { template: "hono", dependencies: ["hono", "@hono/node-server"] };
 
 /* questions for project creation */
 const questions = [
@@ -45,8 +44,7 @@ const questions = [
         message: "Select a platform:",
         choices: [
             { title: "Express", value: JSON.stringify(express) },
-            { title: "Hono", value: JSON.stringify(hono) },
-            { title: "No Platform (Node)", value: null, }
+            { title: "None", value: null, }
         ]
     }
 ];

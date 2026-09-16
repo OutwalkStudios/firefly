@@ -29,7 +29,6 @@ npm install @outwalk/firefly
 - [Event Driven Architecture](#event-driven-architecture)
 - [Database Integration](#database-integration)
 - [Platform (Express)](#express-platform)
-- [Platform (Hono)](#hono-platform)
 - [CLI Commands](#cli-commands)
 
 ---
@@ -317,26 +316,6 @@ import cors from "cors";
 
 /* setup the platform and global middleware */
 const platform = new ExpressPlatform();
-platform.use(cors());
-
-/* start the application */
-new Application({ platform }).listen();
-```
-
----
-
-## Hono Platform
-
-Firefly provides an `HonoPlatform` object for using Hono with the firefly architecture, this enables using the entire Hono ecosystem directly in firefly.
-
-**Example:**
-```js
-import { Application } from "@outwalk/firefly";
-import { HonoPlatform } from "@outwalk/firefly/hono";
-import { cors } from "hono/cors";
-
-/* setup the platform and global middleware */
-const platform = new HonoPlatform();
 platform.use(cors());
 
 /* start the application */
