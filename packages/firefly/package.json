@@ -78,11 +78,9 @@
     "chalk": "^4.1.2",
     "chokidar": "^5.0.0",
     "dotenv": "^17.4.2",
-    "esbuild": "^0.28.2",
     "eslint": "^10.10.0",
     "glob": "^13.0.6",
     "globals": "^17.12.0",
-    "jiti": "^2.7.0",
     "nodemon": "^3.1.14",
     "rolldown": "^1.2.8",
     "yargs-parser": "^22.0.0"
