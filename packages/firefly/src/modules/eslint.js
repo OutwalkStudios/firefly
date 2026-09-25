@@ -1,5 +1,4 @@
-import typescriptParser from "@typescript-eslint/parser";
-import typescriptPlugin from "@typescript-eslint/eslint-plugin";
+import parser from "eslint-parser-oxc";
 import globals from "globals";
 import js from "@eslint/js";
 
@@ -7,7 +6,7 @@ export default {
     configs: {
         language: {
             globals: { ...globals.node },
-            parser: typescriptParser
+            parser: parser
         },
         recommended: {
             ...js.configs.recommended.rules,
@@ -22,11 +21,8 @@ export default {
             "linebreak-style": ["error", "unix"],
             "quotes": ["error", "double", { "allowTemplateLiterals": true }],
             "semi": ["error", "always"],
-            "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": "error"
+            "no-unused-vars": "off", /* this is disabled as a tradeoff for using the oxc parser */
         },
-        plugins: {
-            "@typescript-eslint": typescriptPlugin
-        },
+        plugins: {}
     }
 };
