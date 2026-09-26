@@ -1,7 +1,7 @@
 import firefly from "@outwalk/firefly/eslint";
 
 export default {
-    files: ["src/**/*.{js,ts}"],
+    files: ["src/**/*.{js,jsx,ts,tsx}"],
     languageOptions: { ...firefly.configs.language },
     rules: { ...firefly.configs.recommended },
     plugins: { ...firefly.configs.plugins },

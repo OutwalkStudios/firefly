@@ -6,6 +6,7 @@ export default {
     configs: {
         language: {
             globals: { ...globals.node },
+            parserOptions: { ecmaFeature: { jsx: true } },
             parser: parser
         },
         recommended: {

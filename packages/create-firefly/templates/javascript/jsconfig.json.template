@@ -2,6 +2,7 @@
     "include": ["src"]
     "compilerOptions": {
         "experimentalDecorators": true,
+        "jsx": "react-jsx",
         "allowJs": true,
         "paths": {
             "@/*": [
