@@ -7,7 +7,7 @@ export default async function lint(args) {
     try {
         logger.log("linting the project...");
 
-        const results = await eslint.lintFiles(["src/**/*.{js,ts}"]);
+        const results = await eslint.lintFiles(["src/**/*.{js,jsx,ts,tsx}"]);
 
         if ((args.fix || args.f)) await ESLint.outputFixes(results);
 
