@@ -1,7 +1,7 @@
 {
   "name": "@outwalk/firefly",
   "type": "module",
-  "version": "0.16.2",
+  "version": "0.16.3",
   "description": "Firefly - a modern scalable web framework.",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
