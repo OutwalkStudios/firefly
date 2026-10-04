@@ -1,4 +1,3 @@
-import nodemon from "nodemon";
 import build from "./build";
 import { execSync } from "node:child_process";
 import path from "node:path";
@@ -35,25 +34,10 @@ export default async function start(args) {
 
     try {
         const { main } = loadPackage();
-        const flags = ["-r dotenv/config"];
+        const flags = ["-r dotenv/config", ...(isDev ? ["--watch"] : [])];
 
-        if (!isDev) {
-            return execSync(`node ${flags.join(" ")} ${main}`, { stdio: "inherit" });
-        }
-
-        flags.push(`--watch ${main}`);
-
-        Promise.all([
-            build(args),
-            wait(main).then(() => {
-                nodemon(`${flags.join(" ")} ${main}`);
-
-                nodemon.once("restart", () => process.env.FIREFLY_DISABLE_LOGGING = true);
-                nodemon.on("crash", () => logger.error("failed to reload the application."));
-                nodemon.on("quit", () => process.exit());
-            })
-        ]);
-
+        if (isDev) await Promise.all([build(args), wait(main)]);
+        execSync(`node ${flags.join(" ")} ${main}`, { stdio: "inherit" });
     } catch (error) {
         logger.error(error.message);
     }

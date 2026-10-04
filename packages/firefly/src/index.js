@@ -11,7 +11,8 @@ export class Application {
         this.platform = options?.platform ?? null;
 
         /* make sure we dont log the startup message on each reload when in dev mode */
-        this.logging = !process.env.FIREFLY_DISABLE_LOGGING;
+        this.logging = !process.execArgv.includes("--watch");
+        this.hasRestarted = false;
     }
 
     /* resolve an injectable outside the normal lifecycle */
@@ -46,7 +47,10 @@ export class Application {
 
             /* start the web server */
             this.platform.listen(port);
-            if (this.logging) logger.log(`running on http://localhost:${port}`);
+            if (this.logging && this.hasRestarted) {
+                logger.log(`running on http://localhost:${port}`);
+                this.hasRestarted = true;
+            }
         } catch (error) {
             logger.error(error.message);
         }
