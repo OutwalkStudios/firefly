@@ -1,4 +1,3 @@
-import { globSync } from "glob";
 import { defineConfig, rolldown, watch } from "rolldown";
 import chokidar from "chokidar";
 import { execSync } from "node:child_process";
@@ -42,10 +41,10 @@ export default async function build(args) {
 
         /* determine the input files */
         const findInputFiles = () => {
-            const files = globSync("src/**/*.{js,jsx,ts,tsx}", { ignore: "src/**/*.d.ts" }).map((file) => [
-                path.relative("src", file.slice(0, file.length - path.extname(file).length)),
-                path.join(process.cwd(), file)
-            ]);
+            const files = fs.globSync("src/**/*.{js,jsx,ts,tsx}", { ignore: "src/**/*.d.ts" }).map((file) => {
+                const { dir, name } = path.parse(file);
+                return [path.relative("src", path.join(dir, name)), path.resolve(file)];
+            });
 
             return Object.fromEntries(files);
         };
