@@ -24,13 +24,40 @@ export class ExpressPlatform extends Platform {
     set(...args) { this.app.set(...args); }
     listen(port) { this.app.listen(port); }
 
-    loadController(route, middleware, routes) {
+    /* define a validation middleware so that validation can happen before other middleware */
+    _validation(route) {
+        return async (req, res, next) => {
+            try {
+                for (const { schema, property } of route.validation) {
+                    req[property] = await super.validate(schema, req[property]);
+                }
+
+                next();
+            } catch (error) {
+                next(error);
+            }
+        };
+    }
+
+    loadController(route, middleware, validation, routes) {
         const router = express.Router({ mergeParams: true });
+
+        /* process any controller level validation */
+        for (const { schema, property } of validation) {
+            router.use(async (req, res, next) => {
+                try {
+                    req[property] = await super.validate(schema, req[property]);
+                    next();
+                } catch (error) {
+                    next(error);
+                }
+            });
+        }
+
         if (middleware.length > 0) router.use(...middleware);
 
         for (let route of routes) {
-
-            router[route.method](route.route, ...route.middleware, async (req, res, next) => {
+            router[route.method](route.route, this._validation(route), ...route.middleware, async (req, res, next) => {
                 try {
                     const result = await route.handler(req, res, next);
                     if (result == undefined || result == null) return res.end();
