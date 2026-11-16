@@ -96,7 +96,7 @@ const questions = [
 
     /* find the template paths */
     const templatePath = path.join(Module.__dirname(import.meta.url), "../templates/", config.language);
-    const snippetPath = path.join(Module.__dirname(import.meta.url), "../templates/snippets");
+    const snippetPath = path.join(Module.__dirname(import.meta.url), "../templates/snippets/", config.language);
     const projectPath = !settings.useCurrentDirectory ? config.name : ".";
 
     /* Start copying template files to the destination */
@@ -105,17 +105,11 @@ const questions = [
 
         /* inject global template variables */
         template.inject("project-name", config.name);
-        template.inject("options", !platform ? "" : "{ platform }");
 
         /* apply platform snippets to the template */
-        if (platform) {
-            template.snippet("import-platform", path.join(snippetPath, platform.template, "import-platform.template"));
-            template.snippet("define-platform", path.join(snippetPath, platform.template, "define-platform.template"));
-        } else {
-            template.inject("import-platform", "");
-            template.inject("define-platform", "");
-        }
+        template.snippet("application", path.join(snippetPath, `${platform?.template ?? "none"}.template`));
 
+        /* build the template */
         template.build();
     } catch (error) {
         logger.error(error.message);

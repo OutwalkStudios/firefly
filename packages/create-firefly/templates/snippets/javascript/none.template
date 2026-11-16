@@ -1,0 +1,8 @@
+import { Application } from "@outwalk/firefly";
+
+@Application()
+export class ApplicationRoot {
+
+    /* start the application */
+    async start() {}
+}

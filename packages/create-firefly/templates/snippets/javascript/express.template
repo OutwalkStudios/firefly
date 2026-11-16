@@ -1,0 +1,12 @@
+import { Application, Inject } from "@outwalk/firefly";
+import { ExpressPlatform } from "@outwalk/firefly/express";
+
+@Application()
+export class ApplicationRoot {
+
+    @Inject()
+    platform;
+
+    /* start the application */
+    async start() {}
+}

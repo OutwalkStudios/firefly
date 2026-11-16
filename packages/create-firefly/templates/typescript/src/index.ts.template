@@ -1,7 +1,1 @@
-import { Application } from "@outwalk/firefly";
-{{import-platform}}
-
-{{define-platform}}
-
-/* start the application */
-new Application({{options}}).listen();
+{{application}}
