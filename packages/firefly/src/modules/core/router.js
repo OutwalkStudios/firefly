@@ -1,4 +1,5 @@
 import { Module } from "../../utils/files";
+import { Platform } from "../platform/platform";
 import path from "path";
 import fs from "fs";
 
@@ -13,6 +14,31 @@ export function Init() {
     };
 }
 
+/* load and return the application */
+export async function loadApplication(Application, injectables = {}) {
+    const application = new Application();
+
+    /* inject any injectables */
+    for (let injectable of (application._injected ?? [])) {
+        application[injectable.propertyKey] = injectables[injectable.injectableKey];
+
+        /* throw an error if a platform is incorrectly injected */
+        if (application[injectable.propertyKey] instanceof Platform && injectable.propertyKey != "platform") {
+            throw new Error(`Injectable "${application[injectable.propertyKey].constructor.name}" must be defined as "platform".`);
+        }        
+    }
+
+    /* attach the events to the event emitter and bind the context to the event listener */
+    for (let event of (application._events ?? [])) {
+        injectables["EventEmitter"].on(event.name, event.handler.bind(application));
+    }
+
+    /* run the controller init function */
+    if (application._initMethod) await application[application._initMethod]();
+
+    return application;
+}
+
 /* load and return the injectables */
 export async function loadInjectables(directory, injectables = {}, root = true) {
     const routes = fs.readdirSync(directory);
@@ -20,40 +46,39 @@ export async function loadInjectables(directory, injectables = {}, root = true) 
     for (let route of routes) {
         const stat = fs.statSync(path.join(directory, route));
 
-        if (stat.isDirectory()) {
-            await loadInjectables(path.join(directory, route), injectables, false);
-        }
+        /* recursively scan the directory for injectables */
+        if (stat.isDirectory()) await loadInjectables(path.join(directory, route), injectables, false);
 
-        else if (stat.isFile() && route.endsWith(".service.js")) {
+        /* load the injectables defined in the current file */
+        if (stat.isFile() && route.endsWith(".service.js")) {
             const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
 
             for (let name of Object.keys(exports)) {
                 if (!exports[name]?._injectable) continue;
 
-                if (injectables[name]) {
-                    throw new Error(`Injectable "${name}" already exists and must be unique.`);
-                }
+                if (injectables[name]) throw new Error(`Injectable "${name}" already exists and must be unique.`);
 
                 const injectable = new exports[name]();
                 injectables[name] = injectable;
-
-                /* run the injectable init function if the injectable does not have any child injectables */
-                if (injectable._initMethod && !injectable?._injected) {
-                    await injectable[injectable._initMethod]();
-                }
             }
-
         }
     }
 
-    /* if this is the root load call, inject the nested injectables */
+    /* if this is the root load call, inject the nested injectables and events */
     if (root) {
-        const nestedInjectables = Object.values(injectables).filter((injectable) => injectable?._injected);
-        for (let injectable of nestedInjectables) {
-            for (let inject of injectable._injected) {
+        for (const injectable of Object.values(injectables)) {
+
+            /* inject any injectables */
+            for (const inject of (injectable._injected ?? [])) {
                 injectable[inject.propertyKey] = injectables[inject.injectableKey];
             }
 
+            /* attach the events to the event emitter and bind the context to the event listener */
+            for (let event of (injectable._events ?? [])) {
+                injectables["EventEmitter"].on(event.name, event.handler.bind(injectable));
+            }
+
+            /* run the injectable init function */
             if (injectable._initMethod) await injectable[injectable._initMethod]();
         }
     }
@@ -80,10 +105,16 @@ export async function loadControllers(root, directory, injectables, controllers 
 
                 const controller = new exports[name]();
                 const middleware = exports[name]?._middleware?.class || [];
+                const validation = exports[name]?._validation?.class || [];
 
                 /* inject any injectables */
                 for (let injectable of (controller._injected ?? [])) {
                     controller[injectable.propertyKey] = injectables[injectable.injectableKey];
+                }
+
+                /* attach the events to the event emitter and bind the context to the event listener */
+                for (let event of (controller._events ?? [])) {
+                    injectables["EventEmitter"].on(event.name, event.handler.bind(controller));
                 }
 
                 /* run the controller init function */
@@ -92,6 +123,7 @@ export async function loadControllers(root, directory, injectables, controllers 
                 /* assign the middleware and bind the context to the controller */
                 for (let route of (controller._routes ?? [])) {
                     route.middleware = controller._middleware?.[route.handler.name] ?? [];
+                    route.validation = controller._validation?.[route.handler.name] ?? [];
                     route.handler = route.handler.bind(controller);
                 }
 
@@ -103,50 +135,10 @@ export async function loadControllers(root, directory, injectables, controllers 
                     throw new Error(`Controller "${name}" uses the route "${endpoint}" which already exists.`);
                 }
 
-                controllers[endpoint] = { middleware: middleware, routes: controller._routes ?? [] };
+                controllers[endpoint] = { middleware: middleware, validation: validation, routes: controller._routes ?? [] };
             }
         }
     }
 
     return controllers;
-}
-
-export async function loadEventListeners(root, directory, injectables, listeners = {}) {
-    const routes = fs.readdirSync(directory);
-
-    for (let route of routes) {
-        const stat = fs.statSync(path.join(directory, route));
-
-        if (stat.isDirectory()) {
-            await loadEventListeners(root, path.join(directory, route), injectables, listeners);
-        }
-
-        else if (stat.isFile() && route.endsWith(".events.js")) {
-            const exports = await import(path.join(path.relative(Module.__dirname(import.meta.url), directory), route));
-
-            for (let name of Object.keys(exports)) {
-                if (!exports[name]?._listener) continue;
-
-                const listener = new exports[name]();
-
-                /* inject any injectables */
-                for (let injectable of (listener._injected ?? [])) {
-                    listener[injectable.propertyKey] = injectables[injectable.injectableKey];
-                }
-
-                /* run the event listener init function */
-                if (listener._initMethod) await listener[listener._initMethod]();
-
-                /* get the event emitter injectable instance */
-                const emitter = injectables["EventEmitter"];
-
-                /* attach the events to the event emitter and bind the context to the event listener */
-                for (let event of (listener._events ?? [])) {
-                    emitter.on(event.name, event.handler.bind(listener));
-                }
-            }
-        }
-    }
-
-    return listeners;
 }
