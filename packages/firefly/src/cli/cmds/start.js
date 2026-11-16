@@ -1,5 +1,6 @@
 import build from "./build";
 import { execSync, spawn } from "node:child_process";
+import readline from "node:readline";
 import path from "node:path";
 import fs from "node:fs";
 
@@ -40,8 +41,18 @@ export default async function start(args) {
 
         Promise.all([build(args), wait(main).then(() => {
             const child = spawn("node", [...flags, main], { env: { ...process.env, FORCE_COLOR: "1" } });
-            child.stdout.on("data", (data) => data.toString().includes(`Restarting '${main}'`) || process.stdout.write(data.toString()));
+            const reader = readline.createInterface({ input: child.stdout });
+            let started = false;
+
+            reader.on("line", (line) => {
+                if (line.includes(`Restarting '${main}'`)) return started = true;
+                if (started && line.includes("running on http://localhost:")) return;
+
+                process.stdout.write(line + "\n");
+            });
+
             child.stderr.pipe(process.stderr);
+
             child.on("error", () => logger.error("failed to reload the application."));
             child.on("exit", () => process.exit());
         })]);
