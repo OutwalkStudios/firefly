@@ -1,9 +1,6 @@
 /* a decorator to apply the injectable metadata to a class */
 export function Injectable() {
-    return (target) => { 
-        target._injectable = true;
-        target._name = target.name;
-    };
+    return (target) => { target._injectable = true; };
 }
 
 /* a decorator to apply metadata for dependency injection on a class property */
