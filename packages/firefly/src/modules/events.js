@@ -3,7 +3,6 @@ export class EventEmitter {
 
     /* apply the properties to make the EventEmitter class injectable */
     static _injectable = true;
-    static _name = "EventEmitter";
 
     events = {};
 
@@ -16,14 +15,6 @@ export class EventEmitter {
         this.events[event] = this.events[event] ?? [];
         this.events[event].push(handler);
     }
-}
-
-/* a decorator to apply the event listener metadata to a class */
-export function EventListener() {
-    return (target) => {
-        target._listener = true;
-        target._name = target.name;
-    };
 }
 
 /* a decorator to mark a method as an event */
