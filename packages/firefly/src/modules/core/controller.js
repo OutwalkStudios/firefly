@@ -16,10 +16,12 @@ export function Controller(route) {
 
 /* a decorator to apply middleware to a controller or route */
 export function Middleware(...args) {
-    return (target, key = "class") => {
-        target._middleware = target._middleware ?? {};
-        target._middleware[key] = args;
-    };
+    return (target, key = "class") => { (target._middleware ??= {})[key] = args; };
+}
+
+/* a decorator to validate incoming request data */
+export function Validate(schema, property = "body") {
+    return (target, key = "class") => { ((target._validation ??= {})[key] ??= []).push({ schema, property }); };
 }
 
 export const Http = createHttpDecorator;
