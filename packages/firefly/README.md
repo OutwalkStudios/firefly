@@ -88,8 +88,6 @@ export class TaskController {
 }
 ```
 
----
-
 ### Middleware
 
 Controllers also have support for middleware via the `@Middleware()` decorator. This decorator can be applied to the entire controller or to specific routes.
@@ -121,8 +119,6 @@ export class TaskController {
     }
 }
 ```
-
----
 
 ### Validation
 
