@@ -35,19 +35,23 @@ npm install @outwalk/firefly
 
 ## Application
 
-Your Firefly application starts with the `Application` interface. This object takes in a `platform` and loads the application based on the file based routing and decorators, then sends the data to the chosen platform to be converted into functioning http routes. The the application's `listen()` method accepts a port and defaults to `8080`. This method is what starts the Firefly application.
+Your Firefly application starts with the `@Application()` interface. This decorated class recognizes an injected `platform` and loads the application based on the file based routing and decorators, then sends the data to the chosen platform to be converted into functioning http routes. The the application's optional `start()` method allows you to implement custom logic to be executed at the start of the application.
 
 When you start a new Firefly project, your index.js should look something like this:
 
-```js
-import { Application } from "@outwalk/firefly";
+```ts
+import { Application, Inject } from "@outwalk/firefly";
 import { ExpressPlatform } from "@outwalk/firefly/express";
 
-/* setup the platform and global middleware */
-const platform = new ExpressPlatform();
+@Application()
+export class ApplicationRoot {
 
-/* start the application */
-new Application({ platform }).listen();
+    @Inject()
+    platform!: ExpressPlatform;
+
+    /* start the application */
+    async start(): Promise<void> {}
+}
 ```
 ---
 
@@ -63,25 +67,28 @@ directly from the route method. The returned value will be serialized and sent a
 Controllers are only detected by Firefly when naming your files ending with `.controller.js`. Ex: `tasks.controller.js`.
 
 **Example:**
-```js
+```ts
 import { Controller, Get } from "@outwalk/firefly";
+import type { Request, Response } from "express";
 
 @Controller()
 export class TaskController {
 
-    tasks = ["task 1", "task 2", "task 3"];
+    tasks: string[] = ["task 1", "task 2", "task 3"];
 
     @Get()
-    getTasks() {
+    getTasks(): string[] {
         return this.tasks;
     }
 
     @Get("/:id")
-    getTaskById(req, res) {
-        return this.tasks.find((task) => task == req.params.id);
+    getTaskById(req: Request, res: Response): string {
+        return this.tasks.find((task) => task == req.params.id)!;
     }
 }
 ```
+
+---
 
 ### Middleware
 
@@ -91,25 +98,62 @@ Any values passed into the decorator are associated with the appropriate routes 
 In the following example we apply the `cors` middleware to both the entire controller and to the `getTasks` route method.
 
 **Example:**
-```js
+```ts
 import { Controller, Middleware, Get } from "@outwalk/firefly";
+import type { Request, Response } from "express";
 import cors from "cors";
 
 @Controller()
 @Middleware(cors())
 export class TaskController {
 
-    tasks = ["task 1", "task 2", "task 3"];
+    tasks: string[] = ["task 1", "task 2", "task 3"];
 
     @Get()
     @Middleware(cors())
-    getTasks() {
+    getTasks(): string[] {
         return this.tasks;
     }
 
     @Get("/:id")
-    getTaskById(req, res) {
-        return this.tasks.find((task) => task == req.params.id);
+    getTaskById(req: Request, res: Response): string {
+        return this.tasks.find((task) => task == req.params.id)!;
+    }
+}
+```
+
+---
+
+### Validation
+
+Controllers also have support for validation via the `@Validate()` decorator. This decorator can be applied to the entire controller or to specific routes.
+Any schemas passed into the decorator are associated with the appropriate routes and the underlying platform handles validating the request data.
+
+The `@Validate()` decorator supports the [Standard Schema](https://standardschema.dev/schema) interface, this allows you to use libraries such as Zod, Valibot, and ArkType.
+
+In the following example we validate the request payload on the `createTask` route method.
+
+**Example:**
+```ts
+import { Controller, Validate, Post } from "@outwalk/firefly";
+import type { Request, Response } from "express";
+import { z } from "zod";
+
+export const CreateTaskSchema = z.object({
+    id: z.number("Please enter a valid ID number"),
+    name: z.string().min(3, { message: "Name must be at least 8 characters long." })
+});
+
+export type CreateTaskDTO = z.infer<typeof CreateTaskSchema>
+
+@Controller()
+export class TaskController {
+
+    @Post()
+    @Validate(CreateTaskSchema)
+    async createTask(req: Request<CreateTaskDTO>): Promise<CreateTaskDTO> {
+        console.log("Task Created:" + JSON.stringify(req.body));
+        return req.body;
     }
 }
 ```
@@ -123,20 +167,20 @@ Services are classes marked with the `@Injectable()` decorator that are used to 
 Services are only detected by Firefly when naming your files ending with `.service.js`. Ex: `tasks.service.js`.
 
 **Example:**
-```js
+```ts
 import { Injectable } from "@outwalk/firefly";
 
 @Injectable()
 export class TaskService {
 
-    tasks = ["task 1", "task 2", "task 3"];
+    tasks: string[] = ["task 1", "task 2", "task 3"];
 
-    async getTasks() {
+    async getTasks(): Promise<string[]> {
         return this.tasks;
     }
 
-    async getTaskById(id) {
-        return this.tasks.find((task) => task == id);
+    async getTaskById(id: string): Promise<string> {
+        return this.tasks.find((task) => task == id)!;
     }
 }
 ```
@@ -147,7 +191,7 @@ export class TaskService {
 
 Firefly heavily relies on classes for its API, you can use the normal class constructor but this does not support async functionlity. As an alternative for both controllers and services, you can import the `@Init()` decorator and decorate a class method with it. This method will become an async constructor and get called during construction time of the controller or service.
 
-```js
+```ts
 import { Controller, Init } from "@outwalk/firefly";
 import { readFile } from "node:fs/promises";
 
@@ -155,7 +199,7 @@ import { readFile } from "node:fs/promises";
 export class TaskController {
 
     @Init()
-    async init() {
+    async init(): Promise<void> {
         const data = await readFile("example.txt", "utf8");
     }
 }
@@ -168,26 +212,29 @@ export class TaskController {
 
 Dependency injection is a a technique that allows objects to define their dependencies through instance properties and have them provided through the framework rather than constructing them itself. This works great for creating services to share business logic or share object values across different parts of the application.
 
-In Firefly you can define an object that can be injected using the `@Injectable()` decorator as outlined in the [Building Services](#building-services) section. In order to inject a dependency we can use the `@Inject()` decorator inside a controller or service. The Inject decorator requires the property name to be the camlCase version of the service class name, otherwise the service can be imported and passed as an argument to the Inject decorator.
+In Firefly you can define an object that can be injected using the `@Injectable()` decorator as outlined in the [Building Services](#building-services) section. In order to inject a dependency we can use the `@Inject()` decorator inside a controller or service. The Inject decorator requires the property name to be the camlCase version of the service class name, otherwise the service can be imported and passed as an argument to the Inject decorator. The only exclusion to this rule is platforms which must be defined as `platform` regardless of the platform's class name.
 
 In the following example we will utilze the service created in the previous section, and update the controller from the [Building Controllers](#building-controllers) section to use dependency injection.
 
 **Example:**
-```js
+```ts
 import { Controller, Inject, Get } from "@outwalk/firefly";
+import type { Request, Response } from "express";
+import { TaskService } from "./tasks.service.ts";
 
 @Controller()
 export class TaskController {
 
-    @Inject() taskService;
+    @Inject()
+    taskService: TaskService;
 
     @Get()
-    getTasks() {
+    getTasks(): Promise<string[]> {
         return this.taskService.getTasks();
     }
 
     @Get("/:id")
-    getTaskById(req, res) {
+    getTaskById(req: Request, res: Response): Promise<string> {
         return this.taskService.getTaskById(req.params.id);
     }
 }
@@ -196,8 +243,11 @@ export class TaskController {
 You can also resolve an injection outside the normal lifecycle. This can be done with the `Application.resolveInjection` method.
 
 **Example:**
-```js
-const taskService = Application.resolveInjectable(TaskService)
+```ts
+import { resolveInjectable } from "@outwalk/firefly";
+import { TaskService } from "./tasks.service.ts";
+
+const taskService = resolveInjectable(TaskService);
 ```
 
 ---
@@ -209,16 +259,16 @@ Firefly has built-in error handling, you can throw an error from anywhere in the
 In this example we update the service created in the [Building Services](#building-services) section to throw a 404 error when a task is not found.
 
 **Example:**
-```js
+```ts
 import { Injectable } from "@outwalk/firefly";
 import { NotFound } from "@outwalk/firefly/errors";
 
 @Injectable()
 export class TaskService {
 
-    tasks = ["task 1", "task 2", "task 3"];
+    tasks: string[] = ["task 1", "task 2", "task 3"];
 
-    async getTasks() {
+    async getTasks(): Promise<string[]> {
         if (this.tasks.length == 0) {
             throw new NotFound("There are no tasks.");
         }
@@ -226,12 +276,12 @@ export class TaskService {
         return this.tasks;
     }
 
-    async getTaskById(id) {
+    async getTaskById(id: string): Promise<string> {
         if (!this.tasks.includes(id)) {
             throw new NotFound("The requested task was not found.");
         }
 
-        return this.tasks.find((task) => task == req.params.id);
+        return this.tasks.find((task) => task == req.params.id)!;
     }
 }
 ```
@@ -240,34 +290,31 @@ export class TaskService {
 
 ## Event Driven Architecture
 
-Firefly supports utilizing an event driven architecture by utilizing the `EventEmitter` injectable. Firefly also provides an optional `@EventListener` and `@Event` decorator to define your event handlers in files ending with `.events.js`.
+Firefly supports utilizing an event driven architecture by utilizing the `EventEmitter` injectable. Firefly also provides an `@Event` decorator to define your event handlers in any class decorated with `@Application()`, `@Controller()` or `@Injectable()`.
 
 You can emit an event and pass any data you would like as the second function argument using the `EventEmitter.emit` method. Additionally in places where the `@Event` decorator is not a viable solution, you can use the `EventEmitter.on` method to define a event listener.
 
 In cases where you want to stop further code execution until all the emitted events has completed, you can await its returned promise.
 
 **Example:**
-```js
-import { Inject } from "@outwalk/firefly";
-import { EventListener, EventEmitter, Event } from "@outwalk/firefly/events";
+```ts
+import { Injectable, Inject } from "@outwalk/firefly";
+import { EventEmitter, Event } from "@outwalk/firefly/events";
 
-@EventListener()
-export class TaskEvents {
+export type Task = { id: number, name: string };
 
-    @Inject() eventEmitter;
+@Injectable()
+export class TaskService {
 
-    constructor() {
-        this.eventEmitter.on("task.created", (task) => {
-            console.log("Task Created: " + task.name);
-        });
-    }
+    @Inject()
+    eventEmitter: EventEmitter;
 
-    createTask() {
-        this.eventEmitter.emit("task.created", { id: 1, name: "Task 1" });
+    async createTask(): Promise<void> {
+        await this.eventEmitter.emit("task.created", { id: 1, name: "Task 1" });
     }
 
     @Event("task.created")
-    onTaskCreated(task) {
+    onTaskCreated(task: Task): void {
         console.log("Task Created: " + task.name);
     }
 }
@@ -277,11 +324,10 @@ export class TaskEvents {
 
 ## Database Integration
 
-Firefly does not have any opinion on what database you use, you are free to bring in whatever database and ORM you prefer. However, Firefly does support special handling for files ending in `.entity.ts`.
-Specicially when using TypeScript, entity files have an extra compiler step that supports decorator metadata. This enables the use of ORMs such as [TypeORM](https://typeorm.io/) and [MikroORM](https://mikro-orm.io/).
+Firefly does not have any opinion on what database you use, you are free to bring in whatever database and ORM you prefer. However, Firefly does support decorator metadata with `reflect-metadata` when using TypeScript. This enables the use of ORMs such as [TypeORM](https://typeorm.io/) and [MikroORM](https://mikro-orm.io/).
 
 **TypeORM Example**
-```js
+```ts
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
@@ -304,22 +350,27 @@ export class User {
 
 ## Express Platform
 
-Firefly provides an `ExpressPlatform` object for using Express with the firefly architecture, this enables using the entire Express ecosystem directly in firefly.
+Firefly provides an `ExpressPlatform` injectable for using Express with the firefly architecture, this enables using the entire Express ecosystem directly in firefly.
 
 Firefly also extends the Express Request object by adding a `rawBody` property to it, which is useful for webhook signature validation. When using typescript you can access the request typing for this by importing `RawBodyRequest` from `@outwalk/firefly/express`.
 
 **Example:**
-```js
-import { Application } from "@outwalk/firefly";
+```ts
+import { Application, Inject } from "@outwalk/firefly";
 import { ExpressPlatform } from "@outwalk/firefly/express";
 import cors from "cors";
 
-/* setup the platform and global middleware */
-const platform = new ExpressPlatform();
-platform.use(cors());
+@Application()
+export class ApplicationRoot {
 
-/* start the application */
-new Application({ platform }).listen();
+    @Inject()
+    platform!: ExpressPlatform;
+
+    /* start the application */
+    async start(): Promise<void> {
+        this.platform.use(cors());
+    }
+}
 ```
 
 ---
