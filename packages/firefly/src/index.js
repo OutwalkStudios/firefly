@@ -37,6 +37,9 @@ async function initialize(target) {
         /* sync the injectables to the static container for escape hatch injections */
         Application.injectables = injectables;
 
+        /* if a start function is defined, execute it. this must run before the platform's listen function. */
+        if (typeof application.start == "function") await application.start();
+
         /* if a platform is configured, enable the platform dependent features */
         if (application.platform) {
 
@@ -51,9 +54,6 @@ async function initialize(target) {
 
             logger.log(`running on http://localhost:${port}`);
         }
-
-        /* if a start function is defined, execute it */
-        if (typeof application.start == "function") await application.start();
 
     } catch (error) {
         logger.error(error.message);
